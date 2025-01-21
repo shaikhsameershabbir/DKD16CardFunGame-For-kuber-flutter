@@ -14,7 +14,7 @@ class _GameOptionsState extends State<GameOptions> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
+    // double height = MediaQuery.of(context).size.height;
     return Stack(
       children: [
         Container(
@@ -54,7 +54,7 @@ class _GameOptionsState extends State<GameOptions> {
         Positioned(
             // bottom: 0,
             top: 250,
-            child: Container(
+            child: SizedBox(
               width: width,
               child:
                   Row(mainAxisAlignment: MainAxisAlignment.center, children: [

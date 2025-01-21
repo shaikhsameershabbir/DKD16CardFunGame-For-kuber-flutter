@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kuber/screens/login.dart';
+import 'package:sizer/sizer.dart';
 import 'package:window_manager/window_manager.dart';
 // import 'package:window_manager/window_manager.dart';
 
@@ -10,17 +11,33 @@ void main() async {
   // Maximize the window by default
   windowManager.setFullScreen(true);
 
-  runApp(const MyApp());
+  runApp(MyApp());
 }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       debugShowCheckedModeBanner: false,
+//       home: LogInScreen(),
+//     );
+//   }
+// }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: LogInScreen(),
+    return Sizer(
+      builder: (context, orientation, deviceType) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: LogInScreen(),
+        );
+      },
     );
   }
 }

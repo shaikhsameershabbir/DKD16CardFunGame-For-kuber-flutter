@@ -46,13 +46,13 @@ class LogInScreen extends StatelessWidget {
                       SizedBox(height: 15),
                       Align(
                         alignment: Alignment.center,
-                        child: Container(
+                        child: SizedBox(
                           width: width * 0.25,
                           child: Form(
                             key: _formKey,
                             child: Column(
                               children: [
-                                Container(
+                                SizedBox(
                                   width: width * 0.15,
                                   height: 35,
                                   child: TextFormField(
@@ -65,7 +65,7 @@ class LogInScreen extends StatelessWidget {
                                       // contentPadding:
                                       //     const EdgeInsets.symmetric(
                                       //         horizontal: 10, vertical: 6.0),
-                                      border: const OutlineInputBorder(
+                                      border: OutlineInputBorder(
                                         borderSide: BorderSide.none,
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(10)),
@@ -80,7 +80,7 @@ class LogInScreen extends StatelessWidget {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                Container(
+                                SizedBox(
                                   width: width * 0.15,
                                   height: 35,
                                   child: TextFormField(
@@ -107,7 +107,7 @@ class LogInScreen extends StatelessWidget {
                                 SizedBox(
                                   height: 20,
                                 ),
-                                Container(
+                                SizedBox(
                                   width: width * 0.15,
                                   child: ElevatedButton(
                                     onPressed: () {

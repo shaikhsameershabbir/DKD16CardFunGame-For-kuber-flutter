@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 
 class SettingsCard extends StatefulWidget {
@@ -86,6 +88,8 @@ class _SettingsCardState extends State<SettingsCard>
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
+                      // ignore: duplicate_ignore
+                      // ignore: deprecated_member_use
                       color: widget.color.withOpacity(0.1),
                       // blurRadius: 8,
                       // offset: const Offset(0, 2),

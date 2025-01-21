@@ -5,20 +5,31 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color backgroundColor;
   final Color foregroundColor;
-
-  const CustomButton({
-    Key? key,
-    required this.buttonText,
-    required this.onPressed,
-    this.backgroundColor = const Color(0xFFFF7643), // Default color
-    this.foregroundColor = Colors.white, // Default foreground color (text)
-  }) : super(key: key);
+  final double fontSize;
+  final double btnwidth;
+  final double btnheight;
+  final double borderRadius;
+  final Color textColor;
+// #
+  const CustomButton(
+      {super.key,
+      required this.buttonText,
+      required this.onPressed,
+      this.backgroundColor = const Color.fromARGB(255, 5, 146, 66),
+      this.foregroundColor = Colors.white,
+      this.fontSize = 10,
+      required this.btnwidth,
+      required this.btnheight,
+      required this.borderRadius,
+      this.textColor = Colors.white});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      height: 30,
+    // double screenWidth = MediaQuery.of(context).size.width;
+    // double screenHeight = MediaQuery.of(context).size.height;
+    return SizedBox(
+      width: btnwidth, //screenWidth * 0.07,
+      height: btnheight, //screenHeight * 0.05,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -26,13 +37,16 @@ class CustomButton extends StatelessWidget {
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
           minimumSize: const Size(double.infinity, 48),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
           ),
         ),
         child: Text(
           buttonText,
-          style: const TextStyle(fontSize: 9),
+          style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: textColor),
         ),
       ),
     );

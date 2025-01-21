@@ -5,12 +5,13 @@ class AnimatedButton extends StatefulWidget {
   final VoidCallback onTap;
 
   const AnimatedButton({
-    Key? key,
+    super.key,
     required this.buttonText,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
   _AnimatedButtonState createState() => _AnimatedButtonState();
 }
 
@@ -30,13 +31,14 @@ class _AnimatedButtonState extends State<AnimatedButton> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              _isHovered ? Colors.blue[600]! : Color(0xFF000080)!,
-              _isHovered ? Colors.blue[400]! : Color(0xFF000080)!,
+              _isHovered ? Colors.blue[600]! : Color(0xFF000080),
+              _isHovered ? Colors.blue[400]! : Color(0xFF000080),
             ],
           ),
           borderRadius: BorderRadius.circular(28),
           boxShadow: [
             BoxShadow(
+              // ignore: deprecated_member_use
               color: Colors.blue.withOpacity(_isHovered ? 0.4 : 0.2),
               blurRadius: _isHovered ? 15 : 10,
               offset: Offset(0, _isHovered ? 8 : 5),
