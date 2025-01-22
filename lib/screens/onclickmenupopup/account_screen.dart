@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-class ColoredResultTable extends StatelessWidget {
+class AccountScreenTable extends StatelessWidget {
   final List<Map<String, String>> timeAndResults = [
     {'time': '12:18 PM', 'result': '3'},
     {'time': '12:15 PM', 'result': '5'},
@@ -76,7 +76,7 @@ class ColoredResultTable extends StatelessWidget {
     Color(0xFFd4b66e),
   ];
 
-  ColoredResultTable({super.key});
+  AccountScreenTable({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +86,7 @@ class ColoredResultTable extends StatelessWidget {
 
     return SizedBox(
       width: screenWidth * 0.28,
-      height: screenHeight * 0.912,
+      height: screenHeight * 0.875,
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Table(

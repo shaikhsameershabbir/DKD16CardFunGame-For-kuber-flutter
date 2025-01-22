@@ -37,6 +37,7 @@ dependencies:
   window_manager: ^0.4.3
   sizer: ^3.0.5
   intl: ^0.20.1
+  fluttertoast: ^8.2.10
 
 dev_dependencies:
   flutter_test:
