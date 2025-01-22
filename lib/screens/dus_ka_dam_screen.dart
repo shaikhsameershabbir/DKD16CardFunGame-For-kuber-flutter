@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
@@ -11,8 +14,23 @@ class DusKaDamScreen extends StatefulWidget {
 }
 
 class _DusKaDamScreenState extends State<DusKaDamScreen> {
-  String fromDate = ''; // Store the 'From' date
-  String toDate = ''; // Store the 'To' date
+  int selectedCircleIndex = -1;
+
+  int placeTotalCoin10 = 0;
+  int placeTotalCoin20 = 0;
+  int placeTotalCoin50 = 0;
+  int placeTotalCoin100 = 0;
+  int placeTotalCoin500 = 0;
+  int placeTotalCoin1000 = 0;
+
+  bool is_counter_sale = true;
+  bool is_net_to_pay = false;
+  // bool btnSelected = true;
+  Color btnSelectedColor = Color(0xFF5499c7);
+  Color btnUnselectedColor = Color.fromARGB(255, 235, 239, 241);
+
+  String fromDate = '';
+  String toDate = '';
 
   // Function to open the date picker and set the selected date
   Future<void> _selectDate(BuildContext context, bool isFromDate) async {
@@ -32,7 +50,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
       // Format the selected date
       String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
 
-      // Update the appropriate date based on the `isFromDate` flag
       setState(() {
         if (isFromDate) {
           fromDate = formattedDate;
@@ -43,6 +60,42 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
     }
   }
 
+  //////////////////////////////////// Timer //////////////////////////////
+  late Timer _timer;
+  int _seconds = 150; // 2 minutes and 30 seconds
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_seconds > 0) {
+          _seconds--;
+        } else {
+          _timer.cancel();
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    int minutes = seconds ~/ 60;
+    int remainingSeconds = seconds % 60;
+    return "${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}";
+  }
+
+  //////////////////////////////////////////////////////////////////////////
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -51,7 +104,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
         body: SizedBox(
       width: screenWidth,
       height: screenHeight,
-      // margin: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       child: Stack(
         children: [
           Container(
@@ -160,7 +212,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                 ),
               )),
           Positioned(
-              top: screenHeight * 0.1,
+              top: screenHeight * 0.08,
               left: screenWidth * 0.28,
               child: SizedBox(
                 width: screenWidth * 0.18,
@@ -184,11 +236,82 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                   ],
                 ),
               )),
+
+          ////////// Timer /////////////////////
           Positioned(
-            top: screenHeight * 0.2,
+            top: screenHeight * 0.12,
+            right: screenWidth * 0.29,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Image.asset(
+                  width: screenWidth * 0.26,
+                  height: screenHeight * 0.24,
+                  'assets/duskadam/timer.png', // Add your image to the assets folder
+                  fit: BoxFit.contain,
+                ),
+                Text(
+                  _formatTime(_seconds),
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        offset: Offset(2, 2),
+                        blurRadius: 4,
+                        color: Colors.black,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ///////////////////////////////////// 3N //////////////////
+          Positioned(
+            top: screenHeight * 0.42,
+            right: screenWidth * 0.365,
+            child: Container(
+              width: screenWidth * 0.11,
+              height: screenHeight * 0.13,
+              // color: Colors.red,
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Image.asset(
+                      'assets/duskadam/3.png', // Add your image to the assets folder
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Flexible(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/duskadam/whiteCard.png', // Add your image to the assets folder
+                          fit: BoxFit.contain,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Image.asset(
+                            'assets/duskadam/NK.png', // Add your image to the assets folder
+                            fit: BoxFit.fill,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          Positioned(
+            top: screenHeight * 0.18,
             left: 10,
-            child: SizedBox(
-              width: screenWidth * 0.44,
+            child: Container(
+              width: screenWidth * 0.36,
               // height: screenHeight * 0.4,
               // color: Colors.red,
               child: Column(
@@ -198,14 +321,25 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      circularImage('assets/duskadam/24.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/25.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/26.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/27.png', screenWidth,
-                          screenHeight, true),
+                      circularImage(
+                          onTap: () {
+                            if (selectedCircleIndex > 0) {}
+                          },
+                          image: 'assets/duskadam/24.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          image: 'assets/duskadam/25.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          image: 'assets/duskadam/26.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          image: 'assets/duskadam/27.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
                     ],
                   ),
                   SizedBox(
@@ -214,14 +348,26 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      circularImage('assets/duskadam/28.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/29.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/30.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/31.png', screenWidth,
-                          screenHeight, true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/28.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/29.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/30.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/31.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
                     ],
                   ),
                   SizedBox(
@@ -230,14 +376,26 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      circularImage('assets/duskadam/32.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/33.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/34.png', screenWidth,
-                          screenHeight, true),
-                      circularImage('assets/duskadam/35.png', screenWidth,
-                          screenHeight, true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/32.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/33.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/34.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
+                      circularImage(
+                          onTap: () {},
+                          image: 'assets/duskadam/35.png',
+                          width: screenWidth * 0.07,
+                          isText: true),
                     ],
                   ),
                 ],
@@ -247,33 +405,87 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
           Positioned(
               right: 5, top: 60, child: SizedBox(child: ColoredResultTable())),
           Positioned(
-            bottom: screenHeight * 0.05,
+            bottom: screenHeight * 0.03,
             left: 10,
-            child: SizedBox(
-              width: screenWidth * 0.5,
+            child: Container(
+              width: screenWidth * 0.4,
               // height: screenHeight * 0.4,
               // color: Colors.red,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  circularImage('assets/duskadam/10rs.png', screenWidth,
-                      screenHeight, false),
-                  circularImage('assets/duskadam/20rs.png', screenWidth,
-                      screenHeight, false),
-                  circularImage('assets/duskadam/50rs.png', screenWidth,
-                      screenHeight, false),
-                  circularImage('assets/duskadam/100rs.png', screenWidth,
-                      screenHeight, false),
-                  circularImage('assets/duskadam/500rs.png', screenWidth,
-                      screenHeight, false),
-                  circularImage('assets/duskadam/1krs.png', screenWidth,
-                      screenHeight, false),
+                  circularImage(
+                      onTap: () {
+                        setState(() {
+                          selectedCircleIndex = 1;
+                        });
+                      },
+                      index: 1,
+                      greenCoin: 'assets/duskadam/coin10.png',
+                      image: 'assets/duskadam/10rs.png',
+                      width: screenWidth * 0.05,
+                      isText: false),
+                  circularImage(
+                      onTap: () {
+                        setState(() {
+                          selectedCircleIndex = 2;
+                        });
+                      },
+                      index: 2,
+                      greenCoin: 'assets/duskadam/coin20.png',
+                      image: 'assets/duskadam/20rs.png',
+                      width: screenWidth * 0.05,
+                      isText: false),
+                  circularImage(
+                      onTap: () {
+                        setState(() {
+                          selectedCircleIndex = 3;
+                        });
+                      },
+                      index: 3,
+                      greenCoin: 'assets/duskadam/coin50.png',
+                      image: 'assets/duskadam/50rs.png',
+                      width: screenWidth * 0.05,
+                      isText: false),
+                  circularImage(
+                      onTap: () {
+                        setState(() {
+                          selectedCircleIndex = 4;
+                        });
+                      },
+                      index: 4,
+                      greenCoin: 'assets/duskadam/coin100.png',
+                      image: 'assets/duskadam/100rs.png',
+                      width: screenWidth * 0.05,
+                      isText: false),
+                  circularImage(
+                      onTap: () {
+                        setState(() {
+                          selectedCircleIndex = 5;
+                        });
+                      },
+                      index: 5,
+                      greenCoin: 'assets/duskadam/coin500.png',
+                      image: 'assets/duskadam/500rs.png',
+                      width: screenWidth * 0.05,
+                      isText: false),
+                  circularImage(
+                      onTap: () {
+                        setState(() {
+                          selectedCircleIndex = 6;
+                        });
+                      },
+                      index: 6,
+                      greenCoin: 'assets/duskadam/coin1000.png',
+                      image: 'assets/duskadam/1krs.png',
+                      width: screenWidth * 0.05,
+                      isText: false),
                 ],
               ),
             ),
           ),
           Positioned(
-              bottom: screenHeight * 0.06,
+              bottom: screenHeight * 0.01,
               right: screenWidth * 0.348,
               child: Container(
                 height: screenWidth * 0.09,
@@ -284,7 +496,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                         fit: BoxFit.contain)),
               )),
           Positioned(
-            bottom: screenHeight * 0.21,
+            bottom: screenHeight * 0.15,
             right: screenWidth * 0.48,
             child: SizedBox(
               // color: Colors.red,
@@ -305,12 +517,15 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                       height: screenHeight * 0.035,
                       child: TextFormField(
                         cursorHeight: 12,
+                        style: const TextStyle(
+                            fontSize: 15, fontWeight: FontWeight.bold),
                         decoration: const InputDecoration(
                           hintText: '',
                           hintStyle: TextStyle(fontSize: 12),
                           filled: true,
                           fillColor: Color(0xFFF5FCF9),
-                          contentPadding: EdgeInsets.all(10),
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                           border: OutlineInputBorder(
                             borderSide: BorderSide.none,
                             borderRadius: BorderRadius.all(Radius.circular(1)),
@@ -328,7 +543,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
           ),
           Positioned(
               bottom: screenHeight * 0.25,
-              right: screenWidth * 0.29,
+              right: screenWidth * 0.31,
               child: SizedBox(
                 height: screenWidth * 0.06,
                 width: screenWidth * 0.18,
@@ -369,244 +584,222 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          shape: LinearBorder(),
-          insetPadding: EdgeInsets.zero,
-          child: Container(
-            // color: Colors.red,
-            width: screenWidth * 0.9,
-            height: screenHeight * 0.9,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              // crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  width: screenWidth * 0.9,
-                  height: screenHeight * 0.05,
-                  color: Color(0xFF5499c7),
-                  child: Row(
-                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SizedBox(
-                        width: 60,
-                        height: 60,
-                      ),
-                      Spacer(),
-                      Text(
-                        "Account",
-                        style: TextStyle(
-                            color: Colors.black, fontWeight: FontWeight.bold),
-                      ),
-                      Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Image.asset(
-                          "assets/duskadam/closewindow.png",
+        return StatefulBuilder(builder: (context, setDialogState) {
+          return Dialog(
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            insetPadding: EdgeInsets.zero,
+            child: Container(
+              width: screenWidth * 0.9,
+              height: screenHeight * 0.9,
+              child: Column(
+                children: [
+                  // Header row with title and close button
+                  Container(
+                    width: screenWidth * 0.9,
+                    height: screenHeight * 0.05,
+                    color: Color(0xFF5499c7),
+                    child: Row(
+                      children: [
+                        SizedBox(width: 60, height: 60),
+                        Spacer(),
+                        Text(
+                          "Account",
+                          style: TextStyle(
+                              color: Colors.black, fontWeight: FontWeight.bold),
                         ),
-                      )
+                        Spacer(),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context); // Close the dialog
+                          },
+                          child: Image.asset("assets/duskadam/closewindow.png"),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+                  Row(
+                    children: [
+                      SizedBox(width: 15),
+                      countersale_netto_pay(
+                        onClick: () {
+                          setDialogState(() {
+                            is_counter_sale = true;
+                            is_net_to_pay = false;
+                          });
+                        },
+                        title: "Counter Sale",
+                        fontsize: 12.sp,
+                        bgColor: is_counter_sale
+                            ? btnSelectedColor
+                            : btnUnselectedColor,
+                        borderRadius: 2,
+                      ),
+                      SizedBox(width: 5),
+                      countersale_netto_pay(
+                        onClick: () {
+                          setDialogState(() {
+                            is_counter_sale = false;
+                            is_net_to_pay = true;
+                          });
+                        },
+                        title: "Net Tot Pay",
+                        fontsize: 12.sp,
+                        bgColor: is_net_to_pay
+                            ? btnSelectedColor
+                            : btnUnselectedColor,
+                        borderRadius: 2,
+                      ),
                     ],
                   ),
-                ),
-                SizedBox(
-                  height: screenHeight * 0.04,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 15,
-                    ),
-                    countersale_netto_pay(
-                        "Counter Sale", 12.sp, Color(0xFF5499c7), 2),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    countersale_netto_pay("Net Tot Pay", 12.sp,
-                        Color.fromARGB(255, 235, 239, 241), 2)
-                  ],
-                ),
-                SizedBox(
-                  height: screenHeight * 0.04,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 15,
-                    ),
-                    Text(
-                      "From",
-                      style: TextStyle(
-                          fontSize: 12.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    GestureDetector(
-                      onTap: () => _selectDate(
-                          context, true), // On Tap, select the 'From' date
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            top: 5, right: 65, bottom: 5, left: 5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          fromDate.isEmpty ? 'dd-mm-yyyy' : fromDate,
-                          style: TextStyle(fontSize: 16),
+                  SizedBox(height: screenHeight * 0.04),
+                  Row(
+                    children: [
+                      SizedBox(width: 15),
+                      Text("From",
+                          style: TextStyle(
+                              fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(width: 5),
+                      GestureDetector(
+                        onTap: () => _selectDate(context, true),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 5, right: 65, bottom: 5, left: 5),
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.black, width: 0.2),
+                              borderRadius: BorderRadius.circular(4)),
+                          child: Text(
+                              fromDate.isEmpty ? 'dd-mm-yyyy' : fromDate,
+                              style: TextStyle(fontSize: 16)),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      "To",
-                      style: TextStyle(
-                          fontSize: 12.sp, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    GestureDetector(
-                      onTap: () => _selectDate(
-                          context, false), // On Tap, select the 'To' date
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            top: 5, right: 65, bottom: 5, left: 5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          toDate.isEmpty ? 'dd-mm-yyyy' : toDate,
-                          style: TextStyle(fontSize: 16),
+                      SizedBox(width: 5),
+                      Text("To",
+                          style: TextStyle(
+                              fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                      SizedBox(width: 5),
+                      GestureDetector(
+                        onTap: () => _selectDate(context, false),
+                        child: Container(
+                          padding: EdgeInsets.only(
+                              top: 5, right: 65, bottom: 5, left: 5),
+                          decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.black, width: 0.2),
+                              borderRadius: BorderRadius.circular(4)),
+                          child: Text(toDate.isEmpty ? 'dd-mm-yyyy' : toDate,
+                              style: TextStyle(fontSize: 16)),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    countersale_netto_pay("Submit", 12.sp, Colors.yellow, 2),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    countersale_netto_pay("Cancel", 12.sp, Colors.red, 2),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    countersale_netto_pay("Print", 12.sp, Color(0xFF21618c), 2)
-                  ],
-                ),
-                SizedBox(
-                  height: screenHeight * 0.04,
-                ),
-                Row(
-                  children: [
-                    SizedBox(
-                      width: 5,
-                    ),
-                    AccountTable(),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.only(left: 10),
-                        // width: screenWidth * 0.3,
-                        height: screenHeight * 0.6,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black),
-                          borderRadius: BorderRadius.circular(1),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text("Game Id : 10kaDum"),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text("Counter Sale"),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text("Retailer Code : retailer"),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text("2025-01-21      To     2025-01-21"),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Divider(
-                              height: 2,
-                              color: Colors.black,
-                              thickness: 5,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              "Play            120",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(
-                              "Win            - 0",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            // Text("Comission            120",style: TextStyle(color: Colors.black),),
-                            Divider(
-                              height: 2,
-                              color: Colors.black,
-                              thickness: 5,
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-
-                            Text(
-                              "Outstanding     120",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text("Server Time : 2025-01-21 03:38:05 PM"),
-                          ],
+                      SizedBox(width: 5),
+                      countersale_netto_pay(
+                        onClick: () {},
+                        title: "Submit",
+                        fontsize: 12.sp,
+                        bgColor: Colors.yellow,
+                        borderRadius: 2,
+                      ),
+                      SizedBox(width: 5),
+                      countersale_netto_pay(
+                        onClick: () {},
+                        title: "Cancel",
+                        fontsize: 12.sp,
+                        bgColor: Colors.red,
+                        borderRadius: 2,
+                      ),
+                      SizedBox(width: 5),
+                      countersale_netto_pay(
+                        onClick: () {},
+                        title: "Print",
+                        fontsize: 12.sp,
+                        bgColor: Color(0xFF21618c),
+                        borderRadius: 2,
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: screenHeight * 0.04),
+                  Row(
+                    children: [
+                      SizedBox(width: 5),
+                      AccountTable(),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Container(
+                          padding: EdgeInsets.only(left: 10),
+                          height: screenHeight * 0.6,
+                          decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              borderRadius: BorderRadius.circular(1)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                              Text("Game Id : 10kaDum"),
+                              SizedBox(height: 10),
+                              Text("Counter Sale"),
+                              SizedBox(height: 10),
+                              Text("Retailer Code : retailer"),
+                              SizedBox(height: 10),
+                              Text("2025-01-21 To 2025-01-21"),
+                              SizedBox(height: 10),
+                              Divider(
+                                  height: 2, color: Colors.black, thickness: 5),
+                              SizedBox(height: 10),
+                              Text("Play 120",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 10),
+                              Text("Win - 0",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              is_net_to_pay
+                                  ? SizedBox(height: 10)
+                                  : Container(),
+                              is_net_to_pay
+                                  ? Text("Commission - 12",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold))
+                                  : Container(),
+                              SizedBox(height: 10),
+                              Divider(
+                                  height: 2, color: Colors.black, thickness: 5),
+                              SizedBox(height: 10),
+                              Text("Outstanding 120",
+                                  style:
+                                      TextStyle(fontWeight: FontWeight.bold)),
+                              SizedBox(height: 10),
+                              Text("Server Time : 2025-01-21 03:38:05 PM"),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    )
-                  ],
-                )
-              ],
+                      SizedBox(width: 5),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        });
       },
     );
   }
 
+  // ignore: non_constant_identifier_names
   countersale_netto_pay(
-      String title, double fontsize, Color bgColor, double borderRadius) {
+      {VoidCallback? onClick,
+      required String title,
+      double? fontsize,
+      Color? bgColor,
+      double? borderRadius}) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: onClick,
       style: ElevatedButton.styleFrom(
         backgroundColor: bgColor,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(borderRadius)),
+          borderRadius: BorderRadius.all(Radius.circular(borderRadius!)),
         ),
       ),
       child: Text(
@@ -616,148 +809,33 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
     );
   }
 
-  Widget circularImage(String image, double width, double height, bool isText) {
+  Widget circularImage(
+      {VoidCallback? onTap,
+      required String image,
+      double? width,
+      double? height,
+      required bool isText,
+      int? index,
+      String? greenCoin,
+      int? placedText = 0}) {
     return Stack(
+      alignment: Alignment.center,
       children: [
-        Image.asset(
-          width: width * 0.07,
-          image,
-          fit: BoxFit.cover,
-        ),
-        isText == false
-            ? Container()
-            : Positioned(
-                top: 65,
-                left: 28,
-                child: Text(
-                  "Play",
-                  style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black,
-                      fontSize: 16,
-                      decoration: TextDecoration.none),
-                ))
-      ],
-    );
-  }
-}
-
-class ColoredResultTable extends StatelessWidget {
-  final List<String> results =
-      List.generate(17, (index) => 'Result ${index + 1}');
-  final List<Color> colors = [
-    Colors.amber,
-    Colors.green,
-    Colors.purple,
-    Colors.green,
-    Colors.green,
-    Colors.purple,
-    Colors.purple,
-    Colors.pink,
-    Colors.amber,
-    Colors.purple,
-    Colors.amber,
-    Colors.purple,
-    Colors.green,
-    Colors.pink,
-    Colors.blue,
-    Colors.orange,
-    Colors.teal,
-  ];
-
-  ColoredResultTable({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Retrieve screen width and height using MediaQuery
-    double screenWidth = MediaQuery.of(context).size.width;
-    // double screenHeight = MediaQuery.of(context).size.height;
-
-    return SizedBox(
-      width: screenWidth * 0.28,
-      // height: screenHeight * 0.15,
-      child: Table(
-        border: TableBorder.all(color: Colors.white), // Border around each cell
-        columnWidths: {
-          0: FlexColumnWidth(2),
-          1: FlexColumnWidth(2),
-        },
-        children: [
-          // Header row
-          TableRow(
-            decoration:
-                BoxDecoration(color: const Color.fromARGB(255, 99, 35, 12)),
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Text(
-                    'Time',
-                    style: TextStyle(
-                        fontFamily: 'Times New Roman',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
-                        decoration: TextDecoration.none,
-                        color: Colors.black),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Text(
-                    'Result',
-                    style: TextStyle(
-                        fontFamily: 'Times New Roman',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14.sp,
-                        decoration: TextDecoration.none,
-                        color: Colors.black),
-                  ),
-                ),
-              ),
-            ],
+        GestureDetector(
+          onTap: onTap,
+          child: Image.asset(
+            width: width,
+            selectedCircleIndex == index ? greenCoin! : image,
+            fit: BoxFit.cover,
           ),
-
-          // Data rows
-          for (int i = 0; i < results.length; i++)
-            TableRow(
-              decoration: BoxDecoration(
-                color: colors[i],
-              ),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      'Time ${i + 1}',
-                      style: TextStyle(
-                          fontFamily: 'Times New Roman',
-                          fontWeight: FontWeight.normal,
-                          fontSize: 12.sp,
-                          decoration: TextDecoration.none,
-                          color: Colors.black),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                    child: Text(
-                      results[i],
-                      style: TextStyle(
-                          fontFamily: 'Times New Roman',
-                          fontWeight: FontWeight.normal,
-                          fontSize: 12.sp,
-                          decoration: TextDecoration.none,
-                          color: Colors.black),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-        ],
-      ),
+        ),
+        placedText! > 0
+            ? Text(
+                "$placedText",
+                style: TextStyle(fontSize: 15.sp),
+              )
+            : Container()
+      ],
     );
   }
 }
@@ -768,7 +846,7 @@ class AccountTable extends StatelessWidget {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      width: screenWidth * 0.5,
+      width: screenWidth * 0.6,
       height: screenHeight * 0.6,
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black),
