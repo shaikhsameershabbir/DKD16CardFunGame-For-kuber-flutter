@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
-void reprintDialog(BuildContext context, double width, double height) {
+void cancelDialog(BuildContext context, double width, double height) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -25,7 +25,7 @@ void reprintDialog(BuildContext context, double width, double height) {
                     SizedBox(width: 60, height: 60),
                     Spacer(),
                     Text(
-                      "REPRINT",
+                      "CANCEL",
                       style: TextStyle(
                           fontSize: 15.sp,
                           color: Colors.black,
@@ -44,7 +44,7 @@ void reprintDialog(BuildContext context, double width, double height) {
               SizedBox(
                 height: 20,
               ),
-              ReprintMenuTable()
+              CancelMenuTable()
             ],
           ),
         ),
@@ -53,7 +53,7 @@ void reprintDialog(BuildContext context, double width, double height) {
   );
 }
 
-class ReprintMenuTable extends StatelessWidget {
+class CancelMenuTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -107,7 +107,7 @@ class ReprintMenuTable extends StatelessWidget {
                         fontSize: 11.sp,
                         fontWeight: FontWeight.bold,
                         backgroundColor: Color(0xFFccc51c),
-                        buttonText: "Reprint",
+                        buttonText: "Cancel",
                         onPressed: () {},
                         btnwidth: screenWidth * 0.07,
                         btnheight: screenHeight * 0.05,

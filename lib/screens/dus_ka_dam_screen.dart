@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
 import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
+import 'package:kuber/screens/onclickmenupopup/cancel.dart';
 import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/reprint.dart';
 import 'package:kuber/widgets/custom_button.dart';
@@ -264,9 +265,14 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                         SizedBox(
                           width: screenWidth * 0.01,
                         ),
-                        Image.asset(
-                          "assets/duskadam/cancel.png",
-                          width: screenWidth * 0.04,
+                        GestureDetector(
+                          onTap: () {
+                            cancelDialog(context, screenWidth, screenHeight);
+                          },
+                          child: Image.asset(
+                            "assets/duskadam/cancel.png",
+                            width: screenWidth * 0.04,
+                          ),
                         ),
                         SizedBox(
                           width: screenWidth * 0.01,
