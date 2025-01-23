@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
 import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
+import 'package:kuber/screens/onclickmenupopup/reprint.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
@@ -270,9 +271,14 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                         SizedBox(
                           width: screenWidth * 0.01,
                         ),
-                        Image.asset(
-                          "assets/duskadam/print.png",
-                          width: screenWidth * 0.04,
+                        GestureDetector(
+                          onTap: () {
+                            reprintDialog(context, screenWidth, screenHeight);
+                          },
+                          child: Image.asset(
+                            "assets/duskadam/print.png",
+                            width: screenWidth * 0.04,
+                          ),
                         ),
                         SizedBox(
                           width: screenWidth * 0.005,
