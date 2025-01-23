@@ -537,8 +537,7 @@ void advanceDrawDialog(BuildContext context, double width, double height) {
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           decoration: BoxDecoration(
                             color: Color(0xFF17b6b1), // Light background color
-                            borderRadius:
-                                BorderRadius.circular(8), // Rounded corners
+                            borderRadius: BorderRadius.zero, // Rounded corners
                             border: Border.all(
                                 color: Colors.teal.shade300), // Border styling
                           ),
@@ -547,11 +546,12 @@ void advanceDrawDialog(BuildContext context, double width, double height) {
                             child: TextField(
                               enabled: false,
                               // controller: drawController,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                   border: InputBorder
                                       .none, // No underline/border for the field
-                                  hintText: 'Enter draw:', // Placeholder text
-                                  hintStyle: TextStyle(color: Colors.white)),
+                                  hintText: 'Select Draw:', // Placeholder text
+                                  hintStyle: TextStyle(
+                                      color: Colors.white, fontSize: 11.sp)),
                             ),
                           ),
                         ),
@@ -560,14 +560,35 @@ void advanceDrawDialog(BuildContext context, double width, double height) {
                           decoration: BoxDecoration(
                             color:
                                 Colors.teal.shade50, // Light background color
-                            borderRadius:
-                                BorderRadius.circular(8), // Rounded corners
+                            borderRadius: BorderRadius.zero, // Rounded corners
                             border: Border.all(
                                 color: Colors.teal.shade300), // Border styling
                           ),
                           child: SizedBox(
                             width: 90, // Fixed width for the TextField
                             child: TextField(
+                              onChanged: (value) {
+                                setState(() {
+                                  selectAllDraw = true;
+                                  int numberOfSlots = int.tryParse(value) ?? 0;
+                                  selectedSlots.clear();
+                                  List<String> allSlots =
+                                      generateTimeSlots().where((slot) {
+                                    DateTime now = DateTime.now();
+                                    DateTime slotTime =
+                                        DateFormat('hh:mm a').parse(slot);
+                                    slotTime = DateTime(
+                                        now.year,
+                                        now.month,
+                                        now.day,
+                                        slotTime.hour,
+                                        slotTime.minute);
+                                    return !slotTime.isBefore(now);
+                                  }).toList();
+                                  selectedSlots
+                                      .addAll(allSlots.take(numberOfSlots));
+                                });
+                              },
                               controller: drawController,
                               decoration: const InputDecoration(
                                 border: InputBorder
@@ -589,6 +610,36 @@ void advanceDrawDialog(BuildContext context, double width, double height) {
                               onChanged: (value) {
                                 setState(() {
                                   selectAllDraw = value ?? false;
+                                  if (selectAllDraw) {
+                                    // Add all future and current time slots to selectedSlots
+                                    selectedSlots.clear();
+                                    selectedSlots.addAll(
+                                        generateTimeSlots().where((slot) {
+                                      DateTime now = DateTime.now();
+                                      DateTime slotTime =
+                                          DateFormat('hh:mm a').parse(slot);
+                                      slotTime = DateTime(
+                                          now.year,
+                                          now.month,
+                                          now.day,
+                                          slotTime.hour,
+                                          slotTime.minute);
+                                      return !slotTime.isBefore(
+                                          now); // Select current and future slots
+                                    }));
+
+                                    int totalSlots = int.parse(
+                                        selectedSlots.length.toString());
+                                    setState(() {
+                                      drawController.text =
+                                          totalSlots.toString();
+                                    });
+                                  } else {
+                                    selectedSlots.clear();
+                                    setState(() {
+                                      drawController.clear();
+                                    });
+                                  }
                                 });
                               },
                             ),
@@ -596,7 +647,7 @@ void advanceDrawDialog(BuildContext context, double width, double height) {
                               'Select All Draw',
                               style: TextStyle(color: Colors.white),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 25),
                             ElevatedButton(
                               onPressed: () {
                                 // Handle submit
