@@ -4,6 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
+import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
+import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
@@ -15,6 +17,8 @@ class DusKaDamScreen extends StatefulWidget {
 }
 
 class _DusKaDamScreenState extends State<DusKaDamScreen> {
+  final TextEditingController _barcodeController = TextEditingController();
+
   int downRowSelectedIndex = 0;
   int upRowSelectedIndex = 0;
   List<int> coinTotals = List<int>.filled(12, 0);
@@ -232,9 +236,24 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                     ),
                     Row(
                       children: [
-                        Image.asset(
-                          "assets/duskadam/lock.png",
-                          width: screenWidth * 0.04,
+                        GestureDetector(
+                          onTap: () {
+                            print("Dialog Triggered");
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return Container(
+                                  width: 80,
+                                  height: 90,
+                                  color: Colors.red,
+                                );
+                              },
+                            );
+                          },
+                          child: Image.asset(
+                            "assets/duskadam/lock.png",
+                            width: screenWidth * 0.04,
+                          ),
                         ),
                         SizedBox(
                           width: screenWidth * 0.01,
@@ -777,7 +796,14 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                   children: [
                     Image.asset("assets/duskadam/total.png",
                         fit: BoxFit.contain),
-                    finalResult > 0 ? Text("$finalResult") : Container()
+                    finalResult > 0
+                        ? Text(
+                            textAlign: TextAlign.center,
+                            "$finalResult",
+                            style: TextStyle(
+                                fontSize: 16.sp, fontWeight: FontWeight.bold),
+                          )
+                        : Container()
                   ],
                 ),
               )),
@@ -802,6 +828,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                     child: SizedBox(
                       height: screenHeight * 0.035,
                       child: TextFormField(
+                        onFieldSubmitted: (value) {
+                          showPopup(context, _barcodeController.text,
+                              screenWidth, screenHeight);
+                        },
                         cursorHeight: 12,
                         style: const TextStyle(
                             fontSize: 15, fontWeight: FontWeight.bold),
