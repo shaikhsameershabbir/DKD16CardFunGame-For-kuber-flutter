@@ -10,6 +10,7 @@ class CustomButton extends StatelessWidget {
   final double btnheight;
   final double borderRadius;
   final Color textColor;
+  final FontWeight fontWeight;
 // #
   const CustomButton(
       {super.key,
@@ -21,7 +22,8 @@ class CustomButton extends StatelessWidget {
       required this.btnwidth,
       required this.btnheight,
       required this.borderRadius,
-      this.textColor = Colors.white});
+      this.textColor = Colors.white,
+      this.fontWeight = FontWeight.bold});
 
   @override
   Widget build(BuildContext context) {

@@ -238,17 +238,8 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            print("Dialog Triggered");
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Container(
-                                  width: 80,
-                                  height: 90,
-                                  color: Colors.red,
-                                );
-                              },
-                            );
+                            showChangePasswordDialog(
+                                context, screenWidth, screenHeight);
                           },
                           child: Image.asset(
                             "assets/duskadam/lock.png",
