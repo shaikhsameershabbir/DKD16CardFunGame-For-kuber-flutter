@@ -205,6 +205,13 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                     Expanded(
                       child: Row(
                         children: [
+                          Image.asset(
+                            "assets/duskadam/question.png",
+                            width: screenWidth * 0.04,
+                          ),
+                          SizedBox(
+                            width: 2,
+                          ),
                           GestureDetector(
                             onTap: () {
                               _showAccountPopup(
@@ -214,13 +221,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                               "assets/duskadam/page.png",
                               width: screenWidth * 0.04,
                             ),
-                          ),
-                          SizedBox(
-                            width: 2,
-                          ),
-                          Image.asset(
-                            "assets/duskadam/question.png",
-                            width: screenWidth * 0.04,
                           ),
                           SizedBox(
                             width: 2,
@@ -241,13 +241,31 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            showChangePasswordDialog(
-                                context, screenWidth, screenHeight);
+                            reprintDialog(context, screenWidth, screenHeight);
                           },
                           child: Image.asset(
-                            "assets/duskadam/lock.png",
+                            "assets/duskadam/print.png",
                             width: screenWidth * 0.04,
                           ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * 0.01,
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            cancelDialog(context, screenWidth, screenHeight);
+                          },
+                          child: Image.asset(
+                            "assets/duskadam/cancel.png",
+                            width: screenWidth * 0.04,
+                          ),
+                        ),
+                        SizedBox(
+                          width: screenWidth * 0.01,
+                        ),
+                        Image.asset(
+                          "assets/duskadam/pati.png",
+                          width: screenWidth * 0.04,
                         ),
                         SizedBox(
                           width: screenWidth * 0.01,
@@ -265,31 +283,13 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                         SizedBox(
                           width: screenWidth * 0.01,
                         ),
-                        Image.asset(
-                          "assets/duskadam/pati.png",
-                          width: screenWidth * 0.04,
-                        ),
-                        SizedBox(
-                          width: screenWidth * 0.01,
-                        ),
                         GestureDetector(
                           onTap: () {
-                            cancelDialog(context, screenWidth, screenHeight);
+                            showChangePasswordDialog(
+                                context, screenWidth, screenHeight);
                           },
                           child: Image.asset(
-                            "assets/duskadam/cancel.png",
-                            width: screenWidth * 0.04,
-                          ),
-                        ),
-                        SizedBox(
-                          width: screenWidth * 0.01,
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            reprintDialog(context, screenWidth, screenHeight);
-                          },
-                          child: Image.asset(
-                            "assets/duskadam/print.png",
+                            "assets/duskadam/lock.png",
                             width: screenWidth * 0.04,
                           ),
                         ),
