@@ -21,7 +21,7 @@ class _GameOptionsState extends State<GameOptions> {
           decoration: BoxDecoration(
               image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: AssetImage("assets/bg/game_option_bg.png"))),
+                  image: AssetImage("assets/bg/game_option_bg.jpg"))),
         ),
         Positioned(
           top: 150,

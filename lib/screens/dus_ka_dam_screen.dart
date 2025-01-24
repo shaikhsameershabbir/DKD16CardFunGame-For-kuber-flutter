@@ -9,6 +9,7 @@ import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/cancel.dart';
 import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/reprint.dart';
+import 'package:kuber/screens/onclickmenupopup/view_result.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
@@ -19,7 +20,77 @@ class DusKaDamScreen extends StatefulWidget {
   State<DusKaDamScreen> createState() => _DusKaDamScreenState();
 }
 
-class _DusKaDamScreenState extends State<DusKaDamScreen> {
+class _DusKaDamScreenState extends State<DusKaDamScreen>
+    with SingleTickerProviderStateMixin {
+  // List of asset images
+  final List<String> _images = [
+    'assets/duskadam/colored/Asset 1.png',
+    'assets/duskadam/colored/Asset 2.png',
+    'assets/duskadam/colored/Asset 3.png',
+    'assets/duskadam/colored/Asset 4.png',
+    'assets/duskadam/colored/Asset 5.png',
+    'assets/duskadam/colored/Asset 6.png',
+    'assets/duskadam/colored/Asset 7.png',
+    'assets/duskadam/colored/Asset 8.png',
+    'assets/duskadam/colored/Asset 9.png',
+    'assets/duskadam/colored/Asset 10.png',
+    'assets/duskadam/colored/Asset 11.png',
+    'assets/duskadam/colored/Asset 12.png',
+  ];
+
+  final List<String> _imagesRight = [
+    'assets/duskadam/Asset 1.png',
+    'assets/duskadam/Asset 2.png',
+    'assets/duskadam/Asset 3.png',
+    'assets/duskadam/Asset 4.png',
+    'assets/duskadam/Asset 5.png',
+    'assets/duskadam/Asset 6.png',
+    'assets/duskadam/Asset 7.png',
+    'assets/duskadam/Asset 8.png',
+    'assets/duskadam/Asset 9.png',
+    'assets/duskadam/Asset 10.png',
+    'assets/duskadam/Asset 11.png',
+    'assets/duskadam/Asset 12.png',
+  ];
+
+  late AnimationController _controller;
+  late int _currentImageIndex;
+  late int _currentImageIndexRight;
+
+  @override
+  void initState() {
+    super.initState();
+    _startTimer();
+    _currentImageIndex = 0;
+    _currentImageIndexRight = 0;
+
+    // AnimationController for changing images
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 5),
+    )..addListener(_updateImage);
+
+    // Start the animation (change the image every 1 second)
+    // _controller.repeat();
+    _controller.forward();
+  }
+
+  // Update the image index based on animation value
+  void _updateImage() {
+    setState(() {
+      _currentImageIndex = (_currentImageIndex + 1) % _images.length;
+      _currentImageIndexRight =
+          (_currentImageIndexRight + 1) % _imagesRight.length;
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _timer.cancel();
+    super.dispose();
+  }
+
   final TextEditingController _barcodeController = TextEditingController();
 
   int downRowSelectedIndex = 0;
@@ -41,23 +112,45 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
   int finalResult = 0;
   countFinalResult() {
     setState(() {
-      finalResult = placeTotalCoin1 +
-          placeTotalCoin2 +
-          placeTotalCoin3 +
-          placeTotalCoin4 +
-          placeTotalCoin5 +
-          placeTotalCoin6 +
-          placeTotalCoin7 +
-          placeTotalCoin8 +
-          placeTotalCoin9 +
-          placeTotalCoin10 +
-          placeTotalCoin11 +
-          placeTotalCoin12;
+      if (finalResult < 10000) {
+        finalResult = placeTotalCoin1 +
+            placeTotalCoin2 +
+            placeTotalCoin3 +
+            placeTotalCoin4 +
+            placeTotalCoin5 +
+            placeTotalCoin6 +
+            placeTotalCoin7 +
+            placeTotalCoin8 +
+            placeTotalCoin9 +
+            placeTotalCoin10 +
+            placeTotalCoin11 +
+            placeTotalCoin12;
+      }
       if (finalResult < 0) {
         setState(() {
           finalResult = 0;
         });
       }
+    });
+  }
+
+  resetAllData() {
+    setState(() {
+      finalResult = 0;
+      upRowSelectedIndex = 0;
+
+      placeTotalCoin1 = 0;
+      placeTotalCoin2 = 0;
+      placeTotalCoin3 = 0;
+      placeTotalCoin4 = 0;
+      placeTotalCoin5 = 0;
+      placeTotalCoin6 = 0;
+      placeTotalCoin7 = 0;
+      placeTotalCoin8 = 0;
+      placeTotalCoin9 = 0;
+      placeTotalCoin10 = 0;
+      placeTotalCoin11 = 0;
+      placeTotalCoin12 = 0;
     });
   }
 
@@ -102,12 +195,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
   late Timer _timer;
   int _seconds = 150; // 2 minutes and 30 seconds
 
-  @override
-  void initState() {
-    super.initState();
-    _startTimer();
-  }
-
   void _startTimer() {
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
@@ -118,12 +205,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
         }
       });
     });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
   }
 
   String _formatTime(int seconds) {
@@ -263,9 +344,14 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                         SizedBox(
                           width: screenWidth * 0.01,
                         ),
-                        Image.asset(
-                          "assets/duskadam/pati.png",
-                          width: screenWidth * 0.04,
+                        GestureDetector(
+                          onTap: () {
+                            showResultDialog(context);
+                          },
+                          child: Image.asset(
+                            "assets/duskadam/pati.png",
+                            width: screenWidth * 0.04,
+                          ),
                         ),
                         SizedBox(
                           width: screenWidth * 0.01,
@@ -373,28 +459,33 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                 children: [
                   Flexible(
                     child: Image.asset(
-                      'assets/duskadam/3.png', // Add your image to the assets folder
+                      _images[_currentImageIndex],
                       fit: BoxFit.contain,
                     ),
                   ),
-                  Flexible(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Image.asset(
-                          'assets/duskadam/whiteCard.png', // Add your image to the assets folder
-                          fit: BoxFit.contain,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Image.asset(
-                            'assets/duskadam/NK.png', // Add your image to the assets folder
-                            fit: BoxFit.fill,
-                          ),
-                        ),
-                      ],
-                    ),
+                  SizedBox(
+                    width: 1,
                   ),
+                  Flexible(
+                      child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        // _imagesRight[_currentImageIndexRight],
+                        "assets/duskadam/whiteCard.png",
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned.fill(
+                        top: 0,
+                        left: 10,
+                        child: Image.asset(
+                          _imagesRight[_currentImageIndexRight],
+                          // "assets/duskadam/Asset 1.png",
+                          fit: BoxFit.fitHeight,
+                        ),
+                      )
+                    ],
+                  )),
                 ],
               ),
             ),
@@ -421,8 +512,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin1 -= downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin1 > 0) {
+                                placeTotalCoin1 -= downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -459,9 +552,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin2 =
-                                  placeTotalCoin2 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin2 > 0) {
+                                placeTotalCoin2 =
+                                    placeTotalCoin2 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -479,9 +574,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin3 =
-                                  placeTotalCoin3 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin3 > 0) {
+                                placeTotalCoin3 =
+                                    placeTotalCoin3 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -499,9 +596,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin4 =
-                                  placeTotalCoin4 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin4 > 0) {
+                                placeTotalCoin4 =
+                                    placeTotalCoin4 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -527,9 +626,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin5 =
-                                  placeTotalCoin5 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin5 > 0) {
+                                placeTotalCoin5 =
+                                    placeTotalCoin5 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -547,9 +648,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin6 =
-                                  placeTotalCoin6 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin6 > 0) {
+                                placeTotalCoin6 =
+                                    placeTotalCoin6 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -567,9 +670,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin7 =
-                                  placeTotalCoin7 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin7 > 0) {
+                                placeTotalCoin7 =
+                                    placeTotalCoin7 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -587,9 +692,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin8 =
-                                  placeTotalCoin8 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin8 > 0) {
+                                placeTotalCoin8 =
+                                    placeTotalCoin8 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -615,9 +722,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin9 =
-                                  placeTotalCoin9 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin9 > 0) {
+                                placeTotalCoin9 =
+                                    placeTotalCoin9 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -635,9 +744,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin10 =
-                                  placeTotalCoin10 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin10 > 0) {
+                                placeTotalCoin10 =
+                                    placeTotalCoin10 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -655,9 +766,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin11 =
-                                  placeTotalCoin11 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin11 > 0) {
+                                placeTotalCoin11 =
+                                    placeTotalCoin11 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -675,9 +788,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                             });
                           } else if (event.buttons == kSecondaryMouseButton) {
                             setState(() {
-                              placeTotalCoin12 =
-                                  placeTotalCoin12 - downRowSelectedIndex;
-                              countFinalResult();
+                              if (placeTotalCoin12 > 0) {
+                                placeTotalCoin12 =
+                                    placeTotalCoin12 - downRowSelectedIndex;
+                                countFinalResult();
+                              }
                             });
                           }
                         },
@@ -892,7 +1007,9 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
                       btnwidth: screenWidth * 0.07,
                       btnheight: screenHeight * 0.05,
                       buttonText: "RESET",
-                      onPressed: () {},
+                      onPressed: () {
+                        resetAllData();
+                      },
                       backgroundColor: Color(0xFFa93226),
                       fontSize: 13,
                     ),
@@ -1158,7 +1275,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen> {
             fit: BoxFit.cover,
           ),
         ),
-        coinTotal == 0
+        coinTotal! <= 0
             ? Container()
             : Text(
                 "$coinTotal",
