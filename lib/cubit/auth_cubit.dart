@@ -226,14 +226,78 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void getLast10Bets(context, width, height) {
+    List<Map<String, dynamic>> data = [
+      {
+        "drawTime": "07:27 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 819678,
+        "betTotal": 2220
+      },
+      {
+        "drawTime": "07:27 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 972208,
+        "betTotal": 30
+      },
+      {
+        "drawTime": "07:27 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 977563,
+        "betTotal": 20
+      },
+      {
+        "drawTime": "07:27 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 922328,
+        "betTotal": 20
+      },
+      {
+        "drawTime": "07:24 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 606212,
+        "betTotal": 30
+      },
+      {
+        "drawTime": "07:06 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 308484,
+        "betTotal": 20
+      },
+      {
+        "drawTime": "07:03 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 788083,
+        "betTotal": 20
+      },
+      {
+        "drawTime": "06:30 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 906618,
+        "betTotal": 30
+      },
+      {
+        "drawTime": "06:30 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 298284,
+        "betTotal": 30
+      },
+      {
+        "drawTime": "06:27 PM",
+        "drawDate": "2025-01-28T18:30:00.000Z",
+        "ticketId": 620076,
+        "betTotal": 100
+      },
+    ];
+
     print("print last 10 bets");
     socket.emit("last10Bets", 1); // game id
 
     socket.on("last10BetsResponce", (last10Bets) {
       print("last 10 bets");
       print(last10Bets);
-      // reprintDialog(context, width, height);
+      // reprintDialog(context, width, height, data);
     });
+    reprintDialog(context, width, height, data);
   }
 
   // Logout method

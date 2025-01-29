@@ -48,76 +48,38 @@ void showChangePasswordDialog(
                   children: [
                     // Old Password
                     SizedBox(
-                      width: width * 0.30, // Set the desired width
-                      height: height * 0.10, // Set the desired height
+                      width: width * 0.35, // Set the desired width
+                      height: height * 0.1, // Set the desired height
                       child: Row(
                         children: [
+                          SizedBox(
+                            width: 5,
+                          ),
                           Expanded(
                             child: Container(
+                              height: height * 0.07,
                               decoration: BoxDecoration(
                                 color: Colors.cyan,
                                 border: Border.all(color: Colors.grey),
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              child: TextField(
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  labelText: "        Old Password",
-                                  border: InputBorder.none,
-                                  // contentPadding: const EdgeInsets.all(10),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                              child: Container(
-                            padding: EdgeInsets.all(2),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(5),
-                            ),
-                            child: TextField(
-                              style: TextStyle(fontSize: 15, height: 25 / 15),
-                              textAlignVertical: TextAlignVertical
-                                  .center, // Centers the text vertically
-                              decoration: InputDecoration(
-                                labelText: "",
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          )),
-                        ],
-                      ),
-                    ),
-                    // const SizedBox(height: 20),
-                    // New Password
-
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: width * 0.30, // Set the desired width
-                      height: height * 0.10, // Set the desired height
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.cyan,
-                                border: Border.all(color: Colors.grey),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: TextField(
-                                textAlign: TextAlign.center,
-                                decoration: InputDecoration(
-                                  labelText: "        New Password",
-                                  border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.all(10),
-                                ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "Old Password",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                           Expanded(
                             child: Container(
+                              height: height * 0.07,
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 border: Border.all(color: Colors.grey),
@@ -127,7 +89,63 @@ void showChangePasswordDialog(
                                 decoration: InputDecoration(
                                   labelText: "",
                                   border: InputBorder.none,
-                                  contentPadding: const EdgeInsets.all(10),
+                                  contentPadding:
+                                      const EdgeInsets.only(bottom: 18),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // const SizedBox(height: 20),
+                    // New Password
+
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: width * 0.35, // Set the desired width
+                      height: height * 0.1, // Set the desired height
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 5,
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: height * 0.07,
+                              decoration: BoxDecoration(
+                                color: Colors.cyan,
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "New Password",
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              height: height * 0.07,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  labelText: "",
+                                  border: InputBorder.none,
+                                  contentPadding:
+                                      const EdgeInsets.only(bottom: 18),
                                 ),
                               ),
                             ),

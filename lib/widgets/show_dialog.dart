@@ -16,7 +16,7 @@ void showSuccessDialog(BuildContext context, String msg) {
               child: Row(
                 children: [
                   Image.asset(
-                    "assets/logo/logo.png",
+                    "assets/logo/kuber_logo.png",
                     height: 30,
                   ),
                   Text('10 Ka Dum'),
@@ -48,7 +48,7 @@ void showSuccessDialog(BuildContext context, String msg) {
           child: Row(
             children: [
               Image.asset(
-                "assets/logo/logo.png",
+                "assets/logo/kuber_logo.png",
                 height: 40,
               ),
               Text(
