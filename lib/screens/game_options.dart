@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/screens/dus_ka_dam_screen.dart';
 import 'package:kuber/widgets/animated_button.dart';
 import 'package:kuber/widgets/settings_card.dart';
@@ -89,7 +91,9 @@ class _GameOptionsState extends State<GameOptions> {
                         subtitle: 'Exit the application',
                         color: const Color(0xFFFF7675),
                         onTap: () {
-                          // Handle close tap
+                          final cubit = context.read<AuthCubit>();
+                          cubit.logout();
+                          Navigator.of(context).pop();
                         },
                       ),
                     ],

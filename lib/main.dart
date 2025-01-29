@@ -1,8 +1,13 @@
+import 'package:device_preview_plus/device_preview_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/screens/login.dart';
 import 'package:sizer/sizer.dart';
 import 'package:window_manager/window_manager.dart';
 // import 'package:window_manager/window_manager.dart';
+
+// late IO.Socket socket;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -11,7 +16,14 @@ void main() async {
   // Maximize the window by default
   windowManager.setFullScreen(true);
 
-  runApp(MyApp());
+  runApp(DevicePreview(
+    enabled: false,
+    builder: (context) => BlocProvider(
+      create: (_) =>
+          AuthCubit()..initializeSocket("http://147.93.103.122:4000"),
+      child: MyApp(),
+    ),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -30,67 +42,22 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// import 'package:flutter/material.dart';
+// void main() async {
+//   IO.Socket socket;
+//   socket = IO.io('http://192.168.0.224:4000', <String, dynamic>{
+//     'transports': ['websocket'],
+//   });
+//   socket.on('connect', (_) {
+//     print('Connected to server');
+//   });
+//   socket.on('disconnect', (_) {
+//     print('Not Connected to server');
+//   });
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await windowManager.ensureInitialized();
 
-class ImageAnimationPage extends StatefulWidget {
-  @override
-  _ImageAnimationPageState createState() => _ImageAnimationPageState();
-}
+//   // Maximize the window by default
+//   windowManager.setFullScreen(true);
 
-class _ImageAnimationPageState extends State<ImageAnimationPage>
-    with SingleTickerProviderStateMixin {
-  // List of asset images
-  final List<String> _images = [
-    'assets/duskadam/colored/Asset 1.png',
-    'assets/duskadam/colored/Asset 2.png',
-    'assets/duskadam/colored/Asset 3.png',
-    'assets/duskadam/colored/Asset 4.png',
-    'assets/duskadam/colored/Asset 5.png',
-  ];
-
-  late AnimationController _controller;
-  late int _currentImageIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentImageIndex = 0;
-
-    // AnimationController for changing images
-    _controller = AnimationController(
-      vsync: this,
-      duration: Duration(seconds: 1),
-    )..addListener(_updateImage);
-
-    // Start the animation (change the image every 1 second)
-    _controller.repeat();
-  }
-
-  // Update the image index based on animation value
-  void _updateImage() {
-    setState(() {
-      _currentImageIndex = (_currentImageIndex + 1) % _images.length;
-    });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Image Animation')),
-      body: Center(
-        child: Flexible(
-          child: Image.asset(
-            _images[_currentImageIndex], // Display image based on current index
-            fit: BoxFit.contain,
-          ),
-        ),
-      ),
-    );
-  }
-}
+//   runApp(DevicePreview(enabled: false, builder: (context) => MyApp()));
+// }

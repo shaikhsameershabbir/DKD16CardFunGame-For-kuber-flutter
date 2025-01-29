@@ -2,15 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
 import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
-import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
+// import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/cancel.dart';
 import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/reprint.dart';
 import 'package:kuber/screens/onclickmenupopup/view_result.dart';
 import 'package:kuber/widgets/custom_button.dart';
+import 'package:kuber/widgets/show_dialog.dart';
 import 'package:sizer/sizer.dart';
 
 class DusKaDamScreen extends StatefulWidget {
@@ -39,27 +42,30 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   ];
 
   final List<String> _imagesRight = [
-    'assets/duskadam/Asset 1.png',
-    'assets/duskadam/Asset 2.png',
-    'assets/duskadam/Asset 3.png',
-    'assets/duskadam/Asset 4.png',
-    'assets/duskadam/Asset 5.png',
-    'assets/duskadam/Asset 6.png',
-    'assets/duskadam/Asset 7.png',
-    'assets/duskadam/Asset 8.png',
-    'assets/duskadam/Asset 9.png',
-    'assets/duskadam/Asset 10.png',
-    'assets/duskadam/Asset 11.png',
-    'assets/duskadam/Asset 12.png',
+    'assets/duskadam/1x.png',
+    'assets/duskadam/2x.png',
+    'assets/duskadam/3x.png',
+    'assets/duskadam/4x.png',
+    'assets/duskadam/5x.png',
+    'assets/duskadam/6x.png',
+    'assets/duskadam/7x.png',
+    'assets/duskadam/8x.png',
+    'assets/duskadam/9x.png',
+    'assets/duskadam/10x.png',
+    'assets/duskadam/11x.png',
+    'assets/duskadam/12x.png',
+    'assets/duskadam/N.png'
   ];
 
   late AnimationController _controller;
+  late Animation<double> _animation;
   late int _currentImageIndex;
   late int _currentImageIndexRight;
 
   @override
   void initState() {
     super.initState();
+    context.read<AuthCubit>().listenForBalanceUpdates();
     _startTimer();
     _currentImageIndex = 0;
     _currentImageIndexRight = 0;
@@ -73,6 +79,9 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
     // Start the animation (change the image every 1 second)
     // _controller.repeat();
     _controller.forward();
+    _animation = Tween<double>(begin: -1.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.linear),
+    );
   }
 
   // Update the image index based on animation value
@@ -134,10 +143,60 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
     });
   }
 
+  Map<String, dynamic> betData = {
+    "bet1": 0,
+    "bet2": 0,
+    "bet3": 0,
+    "bet4": 0,
+    "bet5": 0,
+    "bet6": 0,
+    "bet7": 0,
+    "bet8": 0,
+    "bet9": 0,
+    "bet10": 0,
+    "bet11": 0,
+    "bet12": 0,
+    "advanceBet": false
+  };
+  List<String> advanceArray = [];
+  bool isAdvArray = false;
+  void printBetData(bool isAdvanceBet, List<String> arr) {
+    final cubit = context.read<AuthCubit>();
+
+    setState(() {
+      betData = {
+        "bet1": placeTotalCoin1,
+        "bet2": placeTotalCoin2,
+        "bet3": placeTotalCoin3,
+        "bet4": placeTotalCoin4,
+        "bet5": placeTotalCoin5,
+        "bet6": placeTotalCoin6,
+        "bet7": placeTotalCoin7,
+        "bet8": placeTotalCoin8,
+        "bet9": placeTotalCoin9,
+        "bet10": placeTotalCoin10,
+        "bet11": placeTotalCoin11,
+        "bet12": placeTotalCoin12,
+        "advanceBet": isAdvanceBet,
+        "advanceArray": arr,
+        "gameId": 1
+      };
+    });
+
+    cubit.emitConfirmBet(betData);
+    // context.read<AuthCubit>().listenForBalanceUpdates();
+
+    setState(() {
+      resetAllData();
+    });
+  }
+
   resetAllData() {
     setState(() {
       finalResult = 0;
       upRowSelectedIndex = 0;
+      advanceArray.clear();
+      advanceArray = [];
 
       placeTotalCoin1 = 0;
       placeTotalCoin2 = 0;
@@ -245,6 +304,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
     }
   }
 
+  void onDialogClosed(BuildContext context) {
+    context.read<AuthCubit>().listenForBalanceUpdates();
+  }
+
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
@@ -273,12 +336,19 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                     SizedBox(
                       width: screenWidth * 0.02,
                     ),
-                    Text(
-                      "Balance : 2156",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold),
+                    BlocBuilder<AuthCubit, AuthState>(
+                      builder: (context, state) {
+                        return Text(
+                          state is AuthBalanceUpdated
+                              ? "Balance: ${state.balance}"
+                              : "Balance: loading...",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      },
                     ),
                     SizedBox(
                       width: screenWidth * 0.34,
@@ -322,7 +392,9 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       children: [
                         GestureDetector(
                           onTap: () {
-                            reprintDialog(context, screenWidth, screenHeight);
+                            // reprintDialog(context, screenWidth, screenHeight);
+                            context.read<AuthCubit>().getLast10Bets(
+                                context, screenWidth, screenHeight);
                           },
                           child: Image.asset(
                             "assets/duskadam/print.png",
@@ -334,7 +406,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         ),
                         GestureDetector(
                           onTap: () {
-                            cancelDialog(context, screenWidth, screenHeight);
+                            context.read<AuthCubit>().getCurrentDrawTickets();
+
+                            cancelDialog(context, screenWidth, screenHeight,
+                                onDialogClosed);
                           },
                           child: Image.asset(
                             "assets/duskadam/cancel.png",
@@ -359,7 +434,20 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         GestureDetector(
                           onTap: () {
                             advanceDrawDialog(
-                                context, screenWidth, screenHeight);
+                              context,
+                              MediaQuery.of(context).size.width,
+                              MediaQuery.of(context).size.height,
+                              (selectedSlots) {
+                                setState(() {
+                                  if (selectedSlots.isNotEmpty) {
+                                    isAdvArray = true;
+                                    advanceArray = selectedSlots;
+                                  } else {
+                                    isAdvArray = false;
+                                  }
+                                });
+                              },
+                            );
                           },
                           child: Image.asset(
                             "assets/duskadam/advance.png",
@@ -451,7 +539,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
           Positioned(
             top: screenHeight * 0.48,
             right: screenWidth * 0.365,
-            child: Container(
+            child: SizedBox(
               width: screenWidth * 0.11,
               height: screenHeight * 0.13,
               // color: Colors.red,
@@ -460,32 +548,16 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                   Flexible(
                     child: Image.asset(
                       _images[_currentImageIndex],
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                     ),
                   ),
-                  SizedBox(
-                    width: 1,
-                  ),
                   Flexible(
-                      child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.asset(
-                        // _imagesRight[_currentImageIndexRight],
-                        "assets/duskadam/whiteCard.png",
-                        fit: BoxFit.cover,
-                      ),
-                      Positioned.fill(
-                        top: 0,
-                        left: 10,
-                        child: Image.asset(
-                          _imagesRight[_currentImageIndexRight],
-                          // "assets/duskadam/Asset 1.png",
-                          fit: BoxFit.fitHeight,
-                        ),
-                      )
-                    ],
-                  )),
+                    child: Image.asset(
+                      _imagesRight[_currentImageIndexRight],
+                      // "assets/duskadam/12.png",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -494,7 +566,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
           Positioned(
             top: screenHeight * 0.18,
             left: 10,
-            child: Container(
+            child: SizedBox(
               width: screenWidth * 0.36,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -813,7 +885,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
           Positioned(
             bottom: screenHeight * 0.03,
             left: 10,
-            child: Container(
+            child: SizedBox(
               width: screenWidth * 0.4,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -823,7 +895,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       if (event.buttons == kPrimaryMouseButton) {
                         setState(() {
                           downRowSelectedIndex = 10;
-                          print("$downRowSelectedIndex is the one");
                         });
                       } else if (event.buttons == kSecondaryMouseButton) {
                         // Right-click event
@@ -913,7 +984,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
           Positioned(
               bottom: screenHeight * 0.01,
               right: screenWidth * 0.348,
-              child: Container(
+              child: SizedBox(
                 height: screenWidth * 0.09,
                 width: screenWidth * 0.14,
                 child: Stack(
@@ -954,8 +1025,13 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       height: screenHeight * 0.035,
                       child: TextFormField(
                         onFieldSubmitted: (value) {
-                          showPopup(context, _barcodeController.text,
-                              screenWidth, screenHeight);
+                          // showSuccessDialog(context, "Winning not declared ! \n Please wait..");
+                          showSuccessDialog(context, "Bettter Luck Next Time!");
+                          // showPopup(context, _barcodeController.text,
+                          //     screenWidth, screenHeight);
+                          // setState(() {
+                          //   _barcodeController.text = "";
+                          // });
                         },
                         cursorHeight: 12,
                         style: const TextStyle(
@@ -996,7 +1072,13 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       btnwidth: screenWidth * 0.07,
                       btnheight: screenHeight * 0.05,
                       buttonText: "PRINT",
-                      onPressed: () {},
+                      onPressed: () {
+                        if (finalResult > 0) {
+                          printBetData(isAdvArray, advanceArray);
+                        } else {
+                          print("Please, place a bet...");
+                        }
+                      },
                       fontSize: 13,
                     ),
                     SizedBox(
@@ -1032,7 +1114,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             insetPadding: EdgeInsets.zero,
-            child: Container(
+            child: SizedBox(
               width: screenWidth * 0.9,
               height: screenHeight * 0.9,
               child: Column(
@@ -1284,138 +1366,4 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
       ],
     );
   }
-
-  // Widget circularImage({
-  //   VoidCallback? onTap,
-  //   required String image,
-  //   double? width,
-  //   double? height,
-  //   int? downRowindex,
-  //   int? upRowSelectedIndex,
-  //   int? coinTotal = 0,
-  //   String? greenCoin,
-  //   int placedText = 0,
-  //   PointerDownEventListener? event,
-  //   int? coin1to12 = 0,
-  // }) {
-  //   return Stack(
-  //     alignment: Alignment.center,
-  //     children: [
-  //       Listener(
-  //         onPointerDown: event,
-  //         child: GestureDetector(
-  //           onTap: onTap,
-  //           child: Image.asset(
-  //             downRowSelectedIndex == downRowindex ? greenCoin ?? image : image,
-  //             width: width,
-  //             height: height,
-  //             fit: BoxFit.cover,
-  //           ),
-  //         ),
-  //       ),
-  //       coin1to12 == 0
-  //           ? Container()
-  //           : Text(
-  //               "$coinTotal",
-  //               style: TextStyle(fontSize: 15.sp),
-  //             ),
-  //     ],
-  //   );
-  // }
-}
-
-class AccountTable extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-    return Container(
-      width: screenWidth * 0.6,
-      height: screenHeight * 0.6,
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black),
-        borderRadius: BorderRadius.circular(1),
-      ),
-      padding: EdgeInsets.all(8),
-      child: SingleChildScrollView(
-        child: Table(
-          columnWidths: {
-            0: FixedColumnWidth(50), // Sr.No width
-            1: FixedColumnWidth(100), // Date width
-            2: FixedColumnWidth(60), // Play width
-            3: FixedColumnWidth(60), // Win width
-            4: FixedColumnWidth(60), // Point width
-          },
-          border: TableBorder.all(
-            color: Colors.black,
-            width: 1,
-          ),
-          children: [
-            // Table header row
-            TableRow(
-              children: [
-                headerCell('Sr.No'),
-                headerCell('Date'),
-                headerCell('Play'),
-                headerCell('Win'),
-                headerCell('Point'),
-              ],
-            ),
-            // Data row
-            TableRow(
-              children: [
-                dataCell('1'),
-                dataCell('21-01-2025', isDate: true),
-                dataCell('120'),
-                dataCell('0'),
-                dataCell('120'),
-              ],
-            ),
-            // Total row
-            TableRow(
-              decoration: BoxDecoration(color: Colors.amber),
-              children: [
-                dataCell(''),
-                dataCell('Total', bold: true),
-                dataCell('120', bold: true),
-                dataCell('0', bold: true),
-                dataCell('120', bold: true),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget dataCell(String text, {bool bold = false, bool isDate = false}) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        style: TextStyle(
-          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-          color: isDate ? Colors.blue : Colors.black, // Set blue for date cells
-          decoration: isDate
-              ? TextDecoration.underline
-              : TextDecoration.none, // Underline for date cells
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  // Helper method for header cells
-  Widget headerCell(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text(
-        text,
-        style: TextStyle(fontWeight: FontWeight.bold),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  // Helper method for data cells
 }

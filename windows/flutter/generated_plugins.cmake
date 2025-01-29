@@ -3,6 +3,9 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  flutter_secure_storage_windows
+  flutter_thermal_printer
+  printing
   screen_retriever_windows
   window_manager
 )

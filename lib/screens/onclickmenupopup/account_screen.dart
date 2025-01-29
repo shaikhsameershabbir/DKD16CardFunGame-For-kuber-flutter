@@ -177,6 +177,104 @@ class AccountScreenTable extends StatelessWidget {
   }
 }
 
+class AccountTable extends StatelessWidget {
+  const AccountTable({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      width: screenWidth * 0.6,
+      height: screenHeight * 0.6,
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.black),
+        borderRadius: BorderRadius.circular(1),
+      ),
+      padding: EdgeInsets.all(8),
+      child: SingleChildScrollView(
+        child: Table(
+          columnWidths: {
+            0: FixedColumnWidth(50), // Sr.No width
+            1: FixedColumnWidth(100), // Date width
+            2: FixedColumnWidth(60), // Play width
+            3: FixedColumnWidth(60), // Win width
+            4: FixedColumnWidth(60), // Point width
+          },
+          border: TableBorder.all(
+            color: Colors.black,
+            width: 1,
+          ),
+          children: [
+            // Table header row
+            TableRow(
+              children: [
+                headerCell('Sr.No'),
+                headerCell('Date'),
+                headerCell('Play'),
+                headerCell('Win'),
+                headerCell('Point'),
+              ],
+            ),
+            // Data row
+            TableRow(
+              children: [
+                dataCell('1'),
+                dataCell('21-01-2025', isDate: true),
+                dataCell('120'),
+                dataCell('0'),
+                dataCell('120'),
+              ],
+            ),
+            // Total row
+            TableRow(
+              decoration: BoxDecoration(color: Colors.amber),
+              children: [
+                dataCell(''),
+                dataCell('Total', bold: true),
+                dataCell('120', bold: true),
+                dataCell('0', bold: true),
+                dataCell('120', bold: true),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget dataCell(String text, {bool bold = false, bool isDate = false}) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
+          color: isDate ? Colors.blue : Colors.black, // Set blue for date cells
+          decoration: isDate
+              ? TextDecoration.underline
+              : TextDecoration.none, // Underline for date cells
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // Helper method for header cells
+  Widget headerCell(String text) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Text(
+        text,
+        style: TextStyle(fontWeight: FontWeight.bold),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  // Helper method for data cells
+}
+
 // final List<Color> colors = [
 //   Color(0xFFc0952b),
 //   Color(0xFF81ba81),

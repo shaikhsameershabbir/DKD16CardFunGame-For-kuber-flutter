@@ -12,7 +12,7 @@ void showPopup(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(1),
         ),
-        child: Container(
+        child: SizedBox(
           // color: Colors.green,
           width: width * 0.35, // Set the desired width
           height: height * 0.38, // Set the desired height
@@ -81,7 +81,7 @@ void showPopup(
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
+                            SizedBox(
                               width: width * 0.2,
                               child: Text(
                                 'TICKET ID:',
@@ -106,7 +106,7 @@ void showPopup(
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
+                            SizedBox(
                               width: width * 0.2,
                               child: Text(
                                 'LUCKY NUMBER:',
@@ -131,7 +131,7 @@ void showPopup(
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
+                            SizedBox(
                               width: width * 0.2,
                               child: Text(
                                 'DRAW TIME:',
@@ -156,7 +156,7 @@ void showPopup(
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(
+                            SizedBox(
                               width: width * 0.2,
                               child: Text(
                                 'WON POINTS:',
