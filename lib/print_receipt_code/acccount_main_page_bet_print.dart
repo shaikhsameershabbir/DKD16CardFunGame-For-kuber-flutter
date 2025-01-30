@@ -31,7 +31,7 @@ class AcccountMainPageBetPrint {
     // Extract bet details for each ticketId
     for (var ticketId in ticketIds) {
       // Extract first bet details
-      var bet = data["betst"].firstWhere(
+      var bet = data["bets"].firstWhere(
           (bet) => bet["ticketId"].toString() == ticketId.toString());
 
       String drawTime = bet["drawTime"].toString();

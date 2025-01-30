@@ -9,6 +9,7 @@ void advanceDrawDialog(
   double width,
   double height,
   Function(List<String>) onSubmitCallback,
+  Function(List<String>) selectDrawCallback,
 ) {
   List<String> advArray = [];
   final Set<String> selectedSlots = {};
@@ -279,6 +280,7 @@ void advanceDrawDialog(
                                   }).toList();
                                   selectedSlots
                                       .addAll(allSlots.take(numberOfSlots));
+                                  selectDrawCallback(selectedSlots.toList());
                                 });
                               },
                               controller: drawController,

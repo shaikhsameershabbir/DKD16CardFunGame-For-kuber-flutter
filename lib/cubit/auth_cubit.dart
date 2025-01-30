@@ -243,19 +243,16 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void getSingleTicketDataFromLast10Bets(String ticket) {
-    print("single ticket: $ticket");
+    // print("single ticket: $ticket");
     socket.emit("getTicketData", ticket);
     socket.off("getTicketDataResponse");
     socket.on("getTicketDataResponse", (singleTicketData) async {
-      print(
-          "getting data from single ticket -----------------------------------------------------j");
-      print(singleTicketData);
+      // print(
+      //     "getting data from single ticket -----------------------------------------------------j");
+      // print(singleTicketData);
       if (singleTicketData != null) {
         await ReprintSingleTicket.printSingleTicketReceipt(singleTicketData);
-      } else {
-        print(
-            "getting data from single ticket --- null--------------------------------------------------j");
-      }
+      } else {}
     });
   }
 

@@ -133,6 +133,9 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
             placeTotalCoin10 +
             placeTotalCoin11 +
             placeTotalCoin12;
+        if (advanceArray.isNotEmpty) {
+          finalResult = finalResult * advanceArray.length;
+        }
       }
       if (finalResult < 0) {
         setState(() {
@@ -180,6 +183,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
         "advanceArray": arr,
         "gameId": 1
       };
+      if (advanceArray.isNotEmpty) {
+        setState(() {
+          finalResult = finalResult * advanceArray.length;
+        });
+      }
     });
 
     cubit.emitConfirmBet(betData);
@@ -433,20 +441,35 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         GestureDetector(
                           onTap: () {
                             advanceDrawDialog(
-                              context,
-                              MediaQuery.of(context).size.width,
-                              MediaQuery.of(context).size.height,
-                              (selectedSlots) {
-                                setState(() {
-                                  if (selectedSlots.isNotEmpty) {
-                                    isAdvArray = true;
-                                    advanceArray = selectedSlots;
-                                  } else {
-                                    isAdvArray = false;
-                                  }
-                                });
-                              },
-                            );
+                                context,
+                                MediaQuery.of(context).size.width,
+                                MediaQuery.of(context).size.height,
+                                (selectedSlots) {
+                              setState(() {
+                                if (selectedSlots.isNotEmpty) {
+                                  isAdvArray = true;
+                                  advanceArray = selectedSlots;
+                                  print(
+                                      "printing advance array in advanceDrawDialog");
+
+                                  print(advanceArray);
+                                } else {
+                                  isAdvArray = false;
+                                }
+                              });
+                            }, (selectDrawSlots) {
+                              print("selected numbered draw slots");
+                              if (selectDrawSlots.isNotEmpty) {
+                                isAdvArray = true;
+                                advanceArray = selectDrawSlots;
+                                print(
+                                    "printing advance array in advanceDraw select Dialog");
+
+                                print(advanceArray);
+                              } else {
+                                isAdvArray = false;
+                              }
+                            });
                           },
                           child: Image.asset(
                             "assets/duskadam/advance.png",
