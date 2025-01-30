@@ -225,79 +225,38 @@ class AuthCubit extends Cubit<AuthState> {
     });
   }
 
+  // reprint show 10 records
   void getLast10Bets(context, width, height) {
-    List<Map<String, dynamic>> data = [
-      {
-        "drawTime": "07:27 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 819678,
-        "betTotal": 2220
-      },
-      {
-        "drawTime": "07:27 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 972208,
-        "betTotal": 30
-      },
-      {
-        "drawTime": "07:27 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 977563,
-        "betTotal": 20
-      },
-      {
-        "drawTime": "07:27 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 922328,
-        "betTotal": 20
-      },
-      {
-        "drawTime": "07:24 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 606212,
-        "betTotal": 30
-      },
-      {
-        "drawTime": "07:06 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 308484,
-        "betTotal": 20
-      },
-      {
-        "drawTime": "07:03 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 788083,
-        "betTotal": 20
-      },
-      {
-        "drawTime": "06:30 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 906618,
-        "betTotal": 30
-      },
-      {
-        "drawTime": "06:30 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 298284,
-        "betTotal": 30
-      },
-      {
-        "drawTime": "06:27 PM",
-        "drawDate": "2025-01-28T18:30:00.000Z",
-        "ticketId": 620076,
-        "betTotal": 100
-      },
-    ];
-
     print("print last 10 bets");
     socket.emit("last10Bets", 1); // game id
 
+    socket.off("last10BetsResponce");
     socket.on("last10BetsResponce", (last10Bets) {
-      print("last 10 bets");
+      print("last 10 bets response");
       print(last10Bets);
-      // reprintDialog(context, width, height, data);
+      List<Map<String, dynamic>> data =
+          List<Map<String, dynamic>>.from(last10Bets);
+      reprintDialog(context, width, height, data);
     });
-    reprintDialog(context, width, height, data);
+    // reprintDialog(context, width, height, data);
+  }
+
+  void getSingleTicketDataFromLast10Bets(String ticket) {
+    print("single ticket: $ticket");
+    socket.emit("getTicketData", ticket);
+    socket.off("getTicketDataResponse");
+    socket.on("getTicketDataResponse", (singleTicketData) async {
+      print(
+          "getting data from single ticket -----------------------------------------------------j");
+      print(singleTicketData);
+      if (singleTicketData != null) {
+        await AcccountMainPageBetPrint.mainPageBetPrintReceipt(
+            singleTicketData);
+      } else {
+        print(
+            "getting data from single ticket --- null--------------------------------------------------j");
+      }
+    });
   }
 
   // Logout method

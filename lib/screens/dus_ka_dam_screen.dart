@@ -10,7 +10,6 @@ import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
 // import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/cancel.dart';
 import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
-import 'package:kuber/screens/onclickmenupopup/reprint.dart';
 import 'package:kuber/screens/onclickmenupopup/view_result.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:kuber/widgets/show_dialog.dart';

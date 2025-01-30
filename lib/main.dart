@@ -20,7 +20,8 @@ void main() async {
     enabled: false,
     builder: (context) => BlocProvider(
       create: (_) =>
-          AuthCubit()..initializeSocket("http://147.93.103.122:4000"),
+          // AuthCubit()..initializeSocket("http://147.93.103.122:4000"),
+          AuthCubit()..initializeSocket("http://192.168.0.225:4000"), // local
       child: MyApp(),
     ),
   ));

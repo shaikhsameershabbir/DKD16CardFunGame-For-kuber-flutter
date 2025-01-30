@@ -38,7 +38,7 @@ void reprintDialog(
                     Spacer(),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pop(context); // Close the dialog
+                        Navigator.of(context).pop(); // Close the dialog
                       },
                       child: Image.asset("assets/duskadam/closewindow.png"),
                     ),
@@ -147,9 +147,10 @@ class _ReprintMenuTableState extends State<ReprintMenuTable> {
                           buttonText: "Reprint",
                           onPressed: () {
                             // print("print ticket on click ${item['ticketId']}");
-                            // context
-                            //     .read<AuthCubit>()
-                            //     .sendCancelTicket(item['ticketId'].toString());
+                            context
+                                .read<AuthCubit>()
+                                .getSingleTicketDataFromLast10Bets(
+                                    item['ticketId'].toString());
                           },
                           btnwidth: screenWidth * 0.07,
                           btnheight: screenHeight * 0.05,
