@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kuber/print_receipt_code/acccount_main_page_bet_print.dart';
+import 'package:kuber/print_receipt_code/reprint_single_ticket.dart';
 import 'package:kuber/screens/onclickmenupopup/reprint.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
@@ -250,8 +251,7 @@ class AuthCubit extends Cubit<AuthState> {
           "getting data from single ticket -----------------------------------------------------j");
       print(singleTicketData);
       if (singleTicketData != null) {
-        await AcccountMainPageBetPrint.mainPageBetPrintReceipt(
-            singleTicketData);
+        await ReprintSingleTicket.printSingleTicketReceipt(singleTicketData);
       } else {
         print(
             "getting data from single ticket --- null--------------------------------------------------j");
