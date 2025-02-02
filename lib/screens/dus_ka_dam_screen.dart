@@ -1,12 +1,24 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:kuber/cubit/auth_cubit.dart';
+import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
+import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_state.dart';
+import 'package:kuber/cubit/claimticket/claim_ticket_cubit.dart';
+import 'package:kuber/cubit/claimticket/claim_ticket_state.dart';
+import 'package:kuber/cubit/cubit/timer_cubit.dart';
+import 'package:kuber/cubit/dkdWinner/dkd_winner_cubit.dart';
+import 'package:kuber/cubit/dkdWinner/dkd_winner_state.dart';
+import 'package:kuber/cubit/drawtimecubit/draw_time_cubit.dart';
+import 'package:kuber/cubit/drawtimecubit/draw_time_state.dart';
+import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
 import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
+import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
 // import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/cancel.dart';
 import 'package:kuber/screens/onclickmenupopup/change_password_popup.dart';
@@ -24,6 +36,37 @@ class DusKaDamScreen extends StatefulWidget {
 
 class _DusKaDamScreenState extends State<DusKaDamScreen>
     with SingleTickerProviderStateMixin {
+//       final List<Map<String, String>> _images = [
+//   {'1': 'assets/duskadam/colored/Asset 1.png'},
+//   {'2': 'assets/duskadam/colored/Asset 2.png'},
+//   {'3': 'assets/duskadam/colored/Asset 3.png'},
+//   {'4': 'assets/duskadam/colored/Asset 4.png'},
+//   {'5': 'assets/duskadam/colored/Asset 5.png'},
+//   {'6': 'assets/duskadam/colored/Asset 6.png'},
+//   {'7': 'assets/duskadam/colored/Asset 7.png'},
+//   {'8': 'assets/duskadam/colored/Asset 8.png'},
+//   {'9': 'assets/duskadam/colored/Asset 9.png'},
+//   {'10': 'assets/duskadam/colored/Asset 10.png'},
+//   {'11': 'assets/duskadam/colored/Asset 11.png'},
+//   {'12': 'assets/duskadam/colored/Asset 12.png'},
+// ];
+
+// final List<Map<String, String>> _imagesRight = [
+//   {'1': 'assets/duskadam/N.png'},
+//   {'2': 'assets/duskadam/2x.png'},
+//   {'3': 'assets/duskadam/3x.png'},
+//   {'4': 'assets/duskadam/4x.png'},
+//   {'5': 'assets/duskadam/5x.png'},
+//   {'6': 'assets/duskadam/6x.png'},
+//   {'7': 'assets/duskadam/7x.png'},
+//   {'8': 'assets/duskadam/8x.png'},
+//   {'9': 'assets/duskadam/9x.png'},
+//   {'10': 'assets/duskadam/10x.png'},
+//   {'11': 'assets/duskadam/11x.png'},
+//   {'12': 'assets/duskadam/12x.png'},
+
+// ];
+
   // List of asset images
   final List<String> _images = [
     'assets/duskadam/colored/Asset 1.png',
@@ -41,7 +84,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   ];
 
   final List<String> _imagesRight = [
-    'assets/duskadam/1x.png',
+    'assets/duskadam/N.png',
     'assets/duskadam/2x.png',
     'assets/duskadam/3x.png',
     'assets/duskadam/4x.png',
@@ -53,7 +96,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
     'assets/duskadam/10x.png',
     'assets/duskadam/11x.png',
     'assets/duskadam/12x.png',
-    'assets/duskadam/N.png'
   ];
 
   late AnimationController _controller;
@@ -61,26 +103,57 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   late int _currentImageIndex;
   late int _currentImageIndexRight;
 
+  bool _isAnimating = false;
+
+  void getTodaysResultListByDate() {
+    String newSelectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    print("data from patti button $newSelectedDate");
+    context
+        .read<GetAndViewResultCubit>()
+        .initializeGetResultsSocket(newSelectedDate);
+  }
+
   @override
   void initState() {
     super.initState();
-    context.read<AuthCubit>().listenForBalanceUpdates();
-    _startTimer();
+    getTodaysResultListByDate();
+
     _currentImageIndex = 0;
     _currentImageIndexRight = 0;
 
     // AnimationController for changing images
     _controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 5),
-    )..addListener(_updateImage);
+      duration: Duration(seconds: 5), // Adjust duration as needed
+    )..addListener(() {
+        setState(() {
+          _currentImageIndex = (_currentImageIndex + 1) % _images.length;
+          _currentImageIndexRight =
+              (_currentImageIndexRight + 1) % _imagesRight.length;
+        });
+      });
 
-    // Start the animation (change the image every 1 second)
-    // _controller.repeat();
-    _controller.forward();
-    _animation = Tween<double>(begin: -1.0, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.linear),
-    );
+    // Ensure animation stops at the correct image
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          _isAnimating = false;
+          getTodaysResultListByDate();
+        });
+      }
+    });
+  }
+
+  void _startAnimation(String winner, String xValue) {
+    _controller.reset();
+    _isAnimating = true;
+    _controller.forward().then((_) {
+      // Ensure final image is set correctly when animation stops
+      setState(() {
+        _currentImageIndex = int.parse(winner) - 1;
+        _currentImageIndexRight = int.parse(xValue) - 1;
+      });
+    });
   }
 
   // Update the image index based on animation value
@@ -99,6 +172,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
     super.dispose();
   }
 
+/////////////////////////////////////////////////////////////////////////////
   final TextEditingController _barcodeController = TextEditingController();
 
   int downRowSelectedIndex = 0;
@@ -162,7 +236,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   };
   List<String> advanceArray = [];
   bool isAdvArray = false;
-  void printBetData(bool isAdvanceBet, List<String> arr) {
+  void printBetData(
+    bool isAdvanceBet,
+    List<String> arr,
+  ) {
     final cubit = context.read<AuthCubit>();
 
     setState(() {
@@ -183,15 +260,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
         "advanceArray": arr,
         "gameId": 1
       };
-      if (advanceArray.isNotEmpty) {
-        setState(() {
-          finalResult = finalResult * advanceArray.length;
-        });
-      }
     });
 
     cubit.emitConfirmBet(betData);
-    // context.read<AuthCubit>().listenForBalanceUpdates();
+    // context.read<BalanceUpdateCubit>().initializeBalanceSocket();
 
     setState(() {
       resetAllData();
@@ -204,6 +276,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
       upRowSelectedIndex = 0;
       advanceArray.clear();
       advanceArray = [];
+      isAdvArray = false;
 
       placeTotalCoin1 = 0;
       placeTotalCoin2 = 0;
@@ -312,7 +385,13 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   }
 
   void onDialogClosed(BuildContext context) {
-    context.read<AuthCubit>().listenForBalanceUpdates();
+    context.read<BalanceUpdateCubit>().initializeBalanceSocket();
+  }
+
+  String _formatTimeSeconds(int seconds) {
+    final int minutes = seconds ~/ 60;
+    final int remainingSeconds = seconds % 60;
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   @override
@@ -343,10 +422,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                     SizedBox(
                       width: screenWidth * 0.02,
                     ),
-                    BlocBuilder<AuthCubit, AuthState>(
+                    BlocBuilder<BalanceUpdateCubit, BalanceUpdateState>(
                       builder: (context, state) {
                         return Text(
-                          state is AuthBalanceUpdated
+                          state is BalanceLoaded
                               ? "Balance: ${state.balance}"
                               : "Balance: loading...",
                           style: TextStyle(
@@ -428,7 +507,15 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         ),
                         GestureDetector(
                           onTap: () {
-                            showResultDialog(context);
+                            String newSelectedDate =
+                                DateFormat('yyyy-MM-dd').format(DateTime.now());
+                            print("data from patti button $newSelectedDate");
+                            context
+                                .read<GetAndViewResultCubit>()
+                                .initializeGetResultsSocket(newSelectedDate);
+                            showResultDialog(
+                              context,
+                            );
                           },
                           child: Image.asset(
                             "assets/duskadam/pati.png",
@@ -519,71 +606,218 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                     SizedBox(
                       width: 15,
                     ),
-                    Text("12:21PM",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 14.sp)),
+                    BlocBuilder<DrawTimeCubit, DrawTimeState>(
+                      builder: (context, state) {
+                        if (state is DrawTimeLoaded) {
+                          return Text(
+                            state.drawTime, // Display time from state
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14.sp,
+                            ),
+                          );
+                        }
+                        return Text(
+                          "Loading...",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14.sp,
+                          ),
+                        );
+                      },
+                    ),
+
+                    // Text("12:21PM",
+                    //     style: TextStyle(
+                    //         fontWeight: FontWeight.bold, fontSize: 14.sp)),
                   ],
                 ),
               )),
 
           ////////// Timer /////////////////////
+          // Positioned(
+          //   top: screenHeight * 0.12,
+          //   right: screenWidth * 0.29,
+          //   child: Stack(
+          //     alignment: Alignment.center,
+          //     children: [
+          //       Image.asset(
+          //         width: screenWidth * 0.26,
+          //         height: screenHeight * 0.24,
+          //         'assets/duskadam/timer.png',
+          //         fit: BoxFit.contain,
+          //       ),
+          //       Text(
+          //         _formatTime(_seconds),  // emit timer state here
+          //         style: TextStyle(
+          //           fontSize: 18.sp,
+          //           fontWeight: FontWeight.bold,
+          //           color: Colors.white,
+          //           shadows: [
+          //             Shadow(
+          //               offset: Offset(2, 2),
+          //               blurRadius: 4,
+          //               color: Colors.black,
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
           Positioned(
             top: screenHeight * 0.12,
             right: screenWidth * 0.29,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.asset(
-                  width: screenWidth * 0.26,
-                  height: screenHeight * 0.24,
-                  'assets/duskadam/timer.png', // Add your image to the assets folder
-                  fit: BoxFit.contain,
-                ),
-                Text(
-                  _formatTime(_seconds),
-                  style: TextStyle(
-                    fontSize: 18.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        offset: Offset(2, 2),
-                        blurRadius: 4,
-                        color: Colors.black,
+            child: BlocBuilder<TimerCubit, TimerState>(
+              builder: (context, state) {
+                String timeText = _formatTimeSeconds(_seconds); // Default time
+
+                if (state is TimerUpdated) {
+                  // Update the timer text with the new seconds value from the socket event
+                  timeText = _formatTimeSeconds(state.seconds);
+                }
+
+                return Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Image.asset(
+                      width: screenWidth * 0.26,
+                      height: screenHeight * 0.24,
+                      'assets/duskadam/timer.png',
+                      fit: BoxFit.contain,
+                    ),
+                    Text(
+                      timeText,
+                      style: TextStyle(
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            offset: Offset(2, 2),
+                            blurRadius: 4,
+                            color: Colors.black,
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           ///////////////////////////////////// 3N //////////////////
           Positioned(
-            top: screenHeight * 0.48,
-            right: screenWidth * 0.365,
-            child: SizedBox(
-              width: screenWidth * 0.11,
-              height: screenHeight * 0.13,
-              // color: Colors.red,
-              child: Row(
-                children: [
-                  Flexible(
-                    child: Image.asset(
-                      _images[_currentImageIndex],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Flexible(
-                    child: Image.asset(
-                      _imagesRight[_currentImageIndexRight],
-                      // "assets/duskadam/12.png",
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ],
+            top: MediaQuery.of(context).size.height * 0.48,
+            right: MediaQuery.of(context).size.width * 0.365,
+            child: BlocListener<DkdWinnerCubit, DkdWinnerState>(
+              listener: (context, state) {
+                if (state is DKDWinnerUpdated) {
+                  _startAnimation(state.winner, state.xvalue);
+                  print(
+                      'DkdWinnerCubit received: ${state.winner}, ${state.xvalue}');
+                }
+              },
+              child: BlocBuilder<DkdWinnerCubit, DkdWinnerState>(
+                builder: (context, state) {
+                  if (state is DKDWinnerUpdated) {
+                    return SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.11,
+                      height: MediaQuery.of(context).size.height * 0.13,
+                      child: Row(
+                        children: [
+                          Flexible(
+                            child: Image.asset(
+                              _images[
+                                  _currentImageIndex], // Updated to reflect animation or final image
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Flexible(
+                            child: Image.asset(
+                              _imagesRight[
+                                  _currentImageIndexRight], // Updated for right-side image
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return Container();
+                },
               ),
             ),
           ),
+
+          ///
+          // Positioned(
+          //   top: MediaQuery.of(context).size.height * 0.48,
+          //   right: MediaQuery.of(context).size.width * 0.365,
+          //   child: BlocListener<DkdWinnerCubit, DkdWinnerState>(
+          //     listener: (context, state) {
+          //       if (state is DKDWinnerUpdated) {
+          //         _startAnimation();
+          //         print(
+          //             'DkdWinnerCubit received: ${state.winner}, ${state.xvalue}');
+          //       }
+          //     },
+          //     child: BlocBuilder<DkdWinnerCubit, DkdWinnerState>(
+          //       builder: (context, state) {
+          //         if (state is DKDWinnerUpdated) {
+          //           return SizedBox(
+          //             width: MediaQuery.of(context).size.width * 0.11,
+          //             height: MediaQuery.of(context).size.height * 0.13,
+          //             child: Row(
+          //               children: [
+          //                 Flexible(
+          //                   child: Image.asset(
+          //                     _images[_currentImageIndex],
+          //                     fit: BoxFit.cover,
+          //                   ),
+          //                 ),
+          //                 Flexible(
+          //                   child: Image.asset(
+          //                     _imagesRight[_currentImageIndexRight],
+          //                     fit: BoxFit.cover,
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           );
+          //         }
+          //         return Container();
+          //       },
+          //     ),
+          //   ),
+          // ),
+
+          // Positioned(
+          //   top: screenHeight * 0.48,
+          //   right: screenWidth * 0.365,
+          //   child: SizedBox(
+          //     width: screenWidth * 0.11,
+          //     height: screenHeight * 0.13,
+          //     // color: Colors.red,
+          //     child: Row(
+          //       children: [
+          //         Flexible(
+          //           child: Image.asset(
+          //             _images[_currentImageIndex],
+          //             fit: BoxFit.cover,
+          //           ),
+          //         ),
+          //         Flexible(
+          //           child: Image.asset(
+          //             _imagesRight[_currentImageIndexRight],
+          //             // "assets/duskadam/12.png",
+          //             fit: BoxFit.cover,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
 
           Positioned(
             top: screenHeight * 0.18,
@@ -617,25 +851,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         image: 'assets/duskadam/24.png',
                         width: screenWidth * 0.07,
                       ),
-                      // circularImage(
-                      //   event: (event) {
-                      //     if (event.buttons == kPrimaryMouseButton) {
-                      //       setState(() {
-                      //         placeTotalCoin1 =
-                      //             placeTotalCoin1 + downRowSelectedIndex;
-                      //         print("printing $downRowSelectedIndex");
-                      //       });
-                      //     } else if (event.buttons == kSecondaryMouseButton) {
-                      //       setState(() {
-                      //         placeTotalCoin1 =
-                      //             placeTotalCoin1 - downRowSelectedIndex;
-                      //       });
-                      //     }
-                      //   },
-                      //   coinTotal: placeTotalCoin1,
-                      //   image: 'assets/duskadam/24.png',
-                      //   width: screenWidth * 0.07,
-                      // ),
                       circularImage(
                         event: (event) {
                           if (event.buttons == kPrimaryMouseButton) {
@@ -1046,19 +1261,41 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                     child: SizedBox(
                       height: screenHeight * 0.035,
                       child: TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "This field cannot be empty";
+                          } else if (value.length != 6) {
+                            return "Must be exactly 6 digits";
+                          } else if (!RegExp(r'^\d{6}$').hasMatch(value)) {
+                            return "Only digits are allowed";
+                          }
+                          return null; // Input is valid
+                        },
+                        // maxLength: 6,
+                        keyboardType: TextInputType.number,
+                        controller: _barcodeController,
                         onFieldSubmitted: (value) {
-                          // showSuccessDialog(context, "Winning not declared ! \n Please wait..");
-                          showSuccessDialog(context, "Bettter Luck Next Time!");
-                          // showPopup(context, _barcodeController.text,
-                          //     screenWidth, screenHeight);
-                          // setState(() {
-                          //   _barcodeController.text = "";
-                          // });
+                          // showSuccessDialog(context,
+                          //     "Winning not declared ! \n Please wait..");
+                          // showSuccessDialog(context, "Bettter Luck Next Time!");
+                          context
+                              .read<ClaimTicketCubit>()
+                              .initializeClaimTicketSocket(
+                                  context,
+                                  _barcodeController.text,
+                                  screenWidth,
+                                  screenHeight);
+
+                          setState(() {
+                            _barcodeController.text = "";
+                          });
                         },
                         cursorHeight: 12,
                         style: const TextStyle(
                             fontSize: 15, fontWeight: FontWeight.bold),
                         decoration: const InputDecoration(
+                          counterText: "", // Hide default character counter
+                          errorStyle: TextStyle(color: Colors.red),
                           hintText: '',
                           hintStyle: TextStyle(fontSize: 12),
                           filled: true,
@@ -1089,20 +1326,49 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                 // color: Colors.red,
                 child: Row(
                   children: [
-                    CustomButton(
-                      borderRadius: 16,
-                      btnwidth: screenWidth * 0.07,
-                      btnheight: screenHeight * 0.05,
-                      buttonText: "PRINT",
-                      onPressed: () {
-                        if (finalResult > 0) {
-                          printBetData(isAdvArray, advanceArray);
-                        } else {
-                          print("Please, place a bet...");
+                    BlocBuilder<TimerCubit, TimerState>(
+                      builder: (context, state) {
+                        bool isButtonEnabled =
+                            false; // Default state (disabled)
+
+                        if (state is TimerUpdated) {
+                          isButtonEnabled = state.seconds >=
+                              10; // Enable button if seconds >= 10
                         }
+
+                        return CustomButton(
+                          borderRadius: 16,
+                          btnwidth: screenWidth * 0.07,
+                          btnheight: screenHeight * 0.05,
+                          buttonText: "PRINT",
+                          onPressed: isButtonEnabled
+                              ? () {
+                                  if (finalResult > 10) {
+                                    printBetData(isAdvArray, advanceArray);
+                                  } else {
+                                    print("Please, place a bet...");
+                                  }
+                                }
+                              : () {}, // Provide an empty function to satisfy VoidCallback
+                          fontSize: 13,
+                        );
                       },
-                      fontSize: 13,
                     ),
+
+                    //  CustomButton(
+                    //         borderRadius: 16,
+                    //         btnwidth: screenWidth * 0.07,
+                    //         btnheight: screenHeight * 0.05,
+                    //         buttonText: "PRINT",
+                    //         onPressed: () {
+                    //           if (finalResult > 10) {
+                    //             printBetData(isAdvArray, advanceArray);
+                    //           } else {
+                    //             print("Please, place a bet...");
+                    //           }
+                    //         },
+                    //         fontSize: 13,
+                    //       ),
                     SizedBox(
                       width: 5,
                     ),
@@ -1356,29 +1622,40 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
     );
   }
 
-  Widget circularImage({
-    required PointerDownEventListener event,
-    required String image,
-    double? width,
-    double? height,
-    int? downRowindex,
-    int? upRowSelectedIndex,
-    int? coinTotal = 0,
-    String? greenCoin,
-    int placedText = 0,
-  }) {
+  Widget circularImage(
+      {required PointerDownEventListener event,
+      required String image,
+      double? width,
+      double? height,
+      int? downRowindex,
+      int? upRowSelectedIndex,
+      int? coinTotal = 0,
+      String? greenCoin,
+      int placedText = 0,
+      bool filter = false}) {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Listener(
-          onPointerDown: event,
-          child: Image.asset(
-            downRowSelectedIndex == downRowindex ? greenCoin ?? image : image,
-            width: width,
-            height: height,
-            fit: BoxFit.cover,
-          ),
-        ),
+        BlocBuilder<TimerCubit, TimerState>(builder: (context, state) {
+          if (state is TimerUpdated) {
+            if (state.seconds < 10) {
+              filter = true;
+              downRowSelectedIndex = 0;
+              coinTotal = 0;
+            } else {
+              filter = false;
+            }
+          }
+          return Listener(
+            onPointerDown: event,
+            child: Image.asset(
+              downRowSelectedIndex == downRowindex ? greenCoin ?? image : image,
+              width: width,
+              height: height,
+              fit: BoxFit.cover,
+            ),
+          );
+        }),
         coinTotal! <= 0
             ? Container()
             : Text(

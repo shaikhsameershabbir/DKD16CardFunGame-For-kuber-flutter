@@ -13,7 +13,7 @@ void cancelDialog(context, width, height, Function onDialogClosed) {
     context: context,
     barrierDismissible: false,
     builder: (BuildContext context) {
-      context.read<AuthCubit>().listenForBalanceUpdates();
+      // context.read<BalanceUpdateCubit>().initializeBalanceSocket();
       return Dialog(
         child: Container(
           width: width * 0.70, // Set the desired width
@@ -150,8 +150,11 @@ class _CancelMenuTableState extends State<CancelMenuTable> {
                                 try {
                                   context.read<AuthCubit>().sendCancelTicket(
                                       ticket['ticketId'].toString());
-                                  showSuccessDialog(context,
-                                      "Ticket successfully cancelled and balance updated");
+                                  showSuccessDialog(
+                                      context,
+                                      "Ticket successfully cancelled and balance updated",
+                                      "",
+                                      0);
                                 } catch (e) {
                                   print("error occured while canceling ticket");
                                 }

@@ -1,5 +1,8 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart';
+import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_state.dart';
 
 void showResultDialog(BuildContext context) {
   showDialog(
@@ -8,8 +11,39 @@ void showResultDialog(BuildContext context) {
   );
 }
 
-class ResultDialog extends StatelessWidget {
+class ResultDialog extends StatefulWidget {
   const ResultDialog({super.key});
+
+  @override
+  State<ResultDialog> createState() => _ResultDialogState();
+}
+
+class _ResultDialogState extends State<ResultDialog> {
+  DateTime? selectedDate;
+
+  String newSelectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+  Future<void> pickDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        print("picked date $picked");
+
+        newSelectedDate = DateFormat('yy-MM-dd').format(picked);
+        print("new selected date $newSelectedDate");
+
+        context
+            .read<GetAndViewResultCubit>()
+            .initializeGetResultsSocket(newSelectedDate);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,34 +88,40 @@ class ResultDialog extends StatelessWidget {
             const SizedBox(height: 8),
 
             // Date and View Button
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  const Text('Date: ', style: TextStyle(fontSize: 16)),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.cyan[100],
-                      border: Border.all(color: Colors.black),
-                    ),
-                    child: const Text('24-01-2025'),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    color: Colors.yellow,
-                    child: const Text(
-                      'View Result',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
+            GestureDetector(
+              onTap: () => pickDate(context),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: Row(
+                  children: [
+                    const Text('Date: ', style: TextStyle(fontSize: 16)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.cyan[100],
+                        border: Border.all(color: Colors.black),
+                      ),
+                      child: Text(
+                        selectedDate != null ? newSelectedDate : 'Select Date',
+                        style: const TextStyle(fontSize: 13),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      color: Colors.yellow,
+                      child: const Text(
+                        'View Result',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 8),
@@ -90,20 +130,16 @@ class ResultDialog extends StatelessWidget {
             Container(
               color: Colors.grey[300],
               padding: const EdgeInsets.all(8),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  '24-01-2025',
+                  newSelectedDate,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ),
 
             // Results Grid
-            Expanded(
-              child: SingleChildScrollView(
-                child: ResultGrid(),
-              ),
-            ),
+            ResultGrid(resultDate: newSelectedDate),
           ],
         ),
       ),
@@ -111,96 +147,94 @@ class ResultDialog extends StatelessWidget {
   }
 }
 
-class ResultGrid extends StatelessWidget {
-  ResultGrid({super.key});
+class ResultGrid extends StatefulWidget {
+  final String resultDate;
+  const ResultGrid({super.key, required this.resultDate});
 
-  final List<List<TimeSlotData>> timeSlots = List.generate(
-    24, // 24 rows: alternating time and random values
-    (index) {
-      if (index % 2 == 0) {
-        // Time row
-        return _createTimeRow(index ~/ 2);
-      } else {
-        // Random numbers row
-        return _createRandomRow();
-      }
-    },
-  );
+  @override
+  State<ResultGrid> createState() => _ResultGridState();
+}
+
+class _ResultGridState extends State<ResultGrid> {
+  @override
+  void initState() {
+    super.initState();
+    // context
+    //     .read<GetAndViewResultCubit>()
+    //     .initializeGetResultsSocket(widget.resultDate);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Table(
-      border: TableBorder.all(color: Colors.black),
-      defaultColumnWidth: const FixedColumnWidth(80),
-      children: timeSlots
-          .map(
-            (row) => TableRow(
-              children: row
-                  .map((slot) => TableCell(
-                        child: Container(
-                          color: row == timeSlots[0]
-                              ? Colors.grey[300]
-                              : Colors.white,
-                          padding: const EdgeInsets.all(4),
-                          child: Text(
-                            slot.time.isNotEmpty
-                                ? slot.time
-                                : slot.value.toString(),
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ),
-                      ))
-                  .toList(),
+    return BlocBuilder<GetAndViewResultCubit, GetAndViewResultState>(
+      builder: (context, state) {
+        if (state is ResultLoaded) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.vertical,
+            child: Table(
+              border: TableBorder.all(color: Colors.black),
+              columnWidths: const {
+                0: FixedColumnWidth(100),
+                1: FixedColumnWidth(100),
+                2: FixedColumnWidth(100),
+                3: FixedColumnWidth(100),
+                4: FixedColumnWidth(100),
+                5: FixedColumnWidth(100),
+                6: FixedColumnWidth(100),
+                7: FixedColumnWidth(100),
+                8: FixedColumnWidth(100),
+                9: FixedColumnWidth(100),
+              },
+              children: List.generate(state.results.length ~/ 10, (rowIndex) {
+                // Create a row for every 10 items
+                final startIndex = rowIndex * 10;
+                final endIndex = startIndex + 10;
+                final rowItems = state.results.sublist(startIndex, endIndex);
+
+                return TableRow(
+                  children: List.generate(10, (columnIndex) {
+                    final itemIndex = rowIndex * 10 + columnIndex;
+                    final item = rowItems[columnIndex];
+
+                    if (rowIndex.isEven) {
+                      return _buildCell(item['drawTime'], Colors.grey[300]);
+                    } else {
+                      // return _buildCell(
+                      //     item['winner'].toString(), Colors.white);
+
+                      return _buildCell(
+                          state.results[itemIndex]['xValue'] > 1
+                              ? state.results[itemIndex]['winner'].toString() +
+                                  " " +
+                                  state.results[itemIndex]['xValue']
+                                      .toString() +
+                                  'X'.toString()
+                              : state.results[itemIndex]['winner'],
+                          Colors.white);
+                    }
+                  }),
+                );
+              }),
             ),
-          )
-          .toList(),
+          );
+        } else if (state is ResultLoadedInitial) {
+          return const Center(child: CircularProgressIndicator());
+        } else {
+          return const Center(child: Text("No data available"));
+        }
+      },
     );
   }
-}
 
-class TimeSlotData {
-  final String time; // For time slots
-  final int value; // For random values
-
-  TimeSlotData(this.time, this.value);
-}
-
-// Generates a row with time slots for a specific hour
-List<TimeSlotData> _createTimeRow(int hour) {
-  final List<String> minutes = [
-    '05',
-    '10',
-    '15',
-    '20',
-    '25',
-    '30',
-    '35',
-    '40',
-    '45',
-    '50',
-    '55',
-    '00'
-  ];
-  final String hourStr = hour.toString().padLeft(2, '0');
-  return List.generate(
-    12,
-    (index) {
-      String nextHour =
-          (hour + (index == 11 ? 1 : 0)).toString().padLeft(2, '0');
-      String time = index == 11
-          ? '$nextHour:${minutes[index]} AM'
-          : '$hourStr:${minutes[index]} AM';
-      return TimeSlotData(time, 0); // Value is 0 for time rows
-    },
-  );
-}
-
-// Generates a row of random numbers from 1 to 12
-List<TimeSlotData> _createRandomRow() {
-  final Random random = Random();
-  return List.generate(
-    12,
-    (_) => TimeSlotData('', random.nextInt(12) + 1),
-  );
+  Widget _buildCell(String value, Color? bgColor) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      color: bgColor,
+      child: Text(
+        value,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 14),
+      ),
+    );
+  }
 }

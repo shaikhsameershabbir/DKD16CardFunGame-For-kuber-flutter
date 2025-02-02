@@ -347,6 +347,8 @@ void advanceDrawDialog(
                                 Navigator.of(context).pop();
 
                                 onSubmitCallback(advArray);
+                                print(
+                                    "printing after onSubmitCallBack $advArray");
                               },
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
