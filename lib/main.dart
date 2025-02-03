@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:device_preview_plus/device_preview_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
 import 'package:kuber/cubit/claimticket/claim_ticket_cubit.dart';
+import 'package:kuber/cubit/counter_sale_nettotpay_cubit/countersale_nettotpay_cubit.dart';
 import 'package:kuber/cubit/cubit/timer_cubit.dart';
 import 'package:kuber/cubit/dkdWinner/dkd_winner_cubit.dart';
 import 'package:kuber/cubit/drawtimecubit/draw_time_cubit.dart';
@@ -19,6 +22,7 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 late IO.Socket socket;
 
 void main() async {
+  HttpOverrides.global = MyHttpOverrides(); // Disable SSL verification
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
 
@@ -31,8 +35,8 @@ void main() async {
   _token = prefs.getString('token');
 
   socket = IO.io(
-    // "http://147.93.103.122:4000",
-    "http://192.168.0.224:4000",
+    "https://147.93.103.122:4000",
+    // "http://192.168.0.224:4000",
     IO.OptionBuilder()
         .setTransports(['websocket'])
         .enableAutoConnect()
@@ -66,7 +70,9 @@ void main() async {
 // ------------------------------------------------------------------------------------------------------
           BlocProvider(create: (context) => ClaimTicketCubit(socket: socket)),
 // ------------------------------------------------------------------------------------------------------
-
+          BlocProvider(
+              create: (context) => CountersaleNettotpayCubit(socket: socket)),
+// ------------------------------------------------------------------------------------------------------
           BlocProvider(
             create: (context) => AuthCubit(
                 socket: socket,
@@ -109,6 +115,15 @@ class MyApp extends StatelessWidget {
         );
       },
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
 

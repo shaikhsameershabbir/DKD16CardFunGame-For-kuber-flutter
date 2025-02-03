@@ -2,7 +2,8 @@ import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
-Future<void> counterSalePrintReceipt() async {
+Future<void> counterSalePrintReceipt(username, fromDate, toDate, playPoint,
+    winAmount, commission, nettopay, serverTime) async {
   final pdf = pw.Document();
 
   pdf.addPage(
@@ -34,13 +35,13 @@ Future<void> counterSalePrintReceipt() async {
                       fontWeight: pw.FontWeight.bold,
                     )),
                 pw.SizedBox(height: 2),
-                pw.Text('Retailer Code:  TR003',
+                pw.Text('Retailer Code:  $username',
                     style: pw.TextStyle(
                         fontSize: 9,
                         fontWeight: pw.FontWeight.bold,
                         color: PdfColors.black)),
                 pw.SizedBox(height: 2),
-                pw.Text('18-01-2025  TO  18-01-2025',
+                pw.Text('$fromDate  TO  $toDate',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,
@@ -48,13 +49,13 @@ Future<void> counterSalePrintReceipt() async {
                 pw.SizedBox(height: 2),
                 pw.Divider(),
                 pw.SizedBox(height: 1),
-                pw.Text('PLAY:       10330',
+                pw.Text('PLAY:       $playPoint',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,
                     )),
                 pw.SizedBox(height: 5),
-                pw.Text('WIN:       -10330',
+                pw.Text('WIN:       $winAmount',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,
@@ -62,13 +63,13 @@ Future<void> counterSalePrintReceipt() async {
                 pw.SizedBox(height: 1),
                 pw.Divider(),
                 pw.SizedBox(height: 3),
-                pw.Text('Outstanding        -1000',
+                pw.Text('Outstanding        $nettopay',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,
                     )),
                 pw.SizedBox(height: 1),
-                pw.Text('Server time 18-01-2025 12:56:45 PM',
+                pw.Text('$serverTime',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,

@@ -12,72 +12,58 @@ class ClaimTicketCubit extends Cubit<ClaimTicketState> {
   void initializeClaimTicketSocket(
       context, ticket, screenWidth, screenHeight) async {
     String message = "";
+    int winAmount;
+    int betTotal;
+    String drawTime;
+    int winner;
+    bool already;
+    bool success;
     try {
       print("i am inside ClaimTicketCubit.............................");
 
-      socket.emit("claimTicket", ticket);
+      // socket.emit("claimTicket", ticket);
+      if (RegExp(r'^\d{6}$').hasMatch(ticket)) {
+        socket.emit("claimTicket", ticket);
+      } else {
+        print("Invalid ticket: Ticket must be a 6-digit number");
+      }
       // socket.emit("claimTicket", "680340");
       socket.off("claimTicketResponse");
       socket.on("claimTicketResponse", (response) {
-        // bool success = response["success"];
-        // String message = response==Map<String, dynamic>? response["data"]["message"] ?? response["message"];
+        print("printing rsponse from claim ticket cubit");
+        print(response);
+        success = response["success"];
+        already = response["already"];
 
-        try {
-          message =
-              (response["data"] is Map<String, dynamic>) ?? response["data"]
-                  ? ["message"]
-                  : response["message"];
-        } catch (e) {
+        Map<String, dynamic> res = response;
+        if (success == true && already == false) {
           message = response["data"]['message'];
-          // showSuccessDialog(context, message, "", 0);
-        }
-        // int winAmount = (response["data"] is Map<String, dynamic>)??  response["data"]["winAmount"] : 0;
-        // int betTotal = (response["data"] is Map<String, dynamic>)??? response["data"]["betTotal"] ?? 0;
-        // String drawTime =(response["data"] is Map<String, dynamic>)?? response["data"]["drawDate"] ?? ""; // Keep as String
-        // int winner = response["data"]["winner"] ?? 0; // Ensure it's an int
 
-        int winAmount = (response["data"] is Map<String, dynamic>)
-            ? response["data"]["winAmount"] ?? 0
-            : 0;
+          winAmount = response["data"]["winAmount"];
 
-        int betTotal = (response["data"] is Map<String, dynamic>)
-            ? response["data"]["betTotal"] ?? 0
-            : 0;
+          betTotal = response["data"]["betTotal"];
 
-        String drawTime = (response["data"] is Map<String, dynamic>)
-            ? response["data"]["drawDate"] ?? ""
-            : "";
+          drawTime = response["data"]["drawDate"];
 
-        // int winner = response["data"]["winner"] ?? 0; // Ensure it's an int
+          winner = response["data"]?["winner"];
 
-        // bool already = response["already"];
-        int winner = response["data"]?["winner"] ?? 0; // Ensure it's an int
-
-        bool already = response["already"] ?? false; // Ensure it's a bool
-
-        print("already claimed=------------------------------");
-
-        print(already);
-        print("already claimed=------------------------------");
-
-        try {
-          showSuccessDialog(context, message, "", 0);
-        } catch (e) {
-          print("Error occured");
-        }
-        if (already == false && (response["data"] is Map<String, dynamic>)) {
-          print("already claimed=------------------------------");
           showPopup(context, ticket, screenWidth, screenHeight, winAmount,
               betTotal, drawTime, winner, ticket);
-          print("object");
+        }
+        if (success == false && already == true) {
+          message = response["data"]["message"];
+          showSuccessDialog(context, message, "", 0);
+        }
+
+        if (success == false && already == false) {
+          message = response["message"];
+          showSuccessDialog(context, message, "", 0);
         }
 
         // emit(ClaimTicketLoaded(response));
       });
     } catch (e) {
-      showSuccessDialog(context, message, "", 0);
+      // showSuccessDialog(context, message, "", 0);
     }
   }
 }
-// claim ticket response {success: false, data:
-// {message: Congratulations, winAmount: 110, drawTime: 03:18 PM, winner: 1}}

@@ -9,11 +9,9 @@ class GetAndViewResultCubit extends Cubit<GetAndViewResultState> {
   GetAndViewResultCubit({required this.socket}) : super(ResultLoadedInitial());
 
   Future<void> initializeGetResultsSocket(date) async {
-    print("i am inside GetAndViewResultCubit.............................");
-    print(date);
     var sendData = {"drawDate": date, "gameId": 1};
     socket.emit("gateDateResult", sendData);
-    // Example of handling a specific event
+
     socket.on('gateDateResultResponse', (results) {
       // print("$results");
       List<Map<String, dynamic>> checkLength =

@@ -102,7 +102,16 @@ class _LogInScreenState extends State<LogInScreen> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          authCubit.login("retailer", "1234", systemUniqueId);
+                          // authCubit.login("retailer", "1234", systemUniqueId);
+                          if (_usernameController.text.isNotEmpty &&
+                              _passwordController.text.isNotEmpty) {
+                            try {
+                              authCubit.login(_usernameController.text,
+                                  _passwordController.text, systemUniqueId);
+                            } catch (e) {
+                              print(e);
+                            }
+                          }
                         }
                       },
                       child: state is AuthLoading

@@ -38,6 +38,7 @@ dependencies:
   barcode_widget: ^2.0.4
   # blue_thermal_printer: ^1.2.3
   printing: ^5.14.0
+  calendar_date_picker2: ^1.1.8
   # flutter_html_to_pdf: ^0.7.0
  
   

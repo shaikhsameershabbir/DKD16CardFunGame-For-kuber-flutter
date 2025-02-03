@@ -10,12 +10,16 @@ import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart'
 import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_state.dart';
 import 'package:kuber/cubit/claimticket/claim_ticket_cubit.dart';
 import 'package:kuber/cubit/claimticket/claim_ticket_state.dart';
+import 'package:kuber/cubit/counter_sale_nettotpay_cubit/countersale_nettotpay_cubit.dart';
+import 'package:kuber/cubit/counter_sale_nettotpay_cubit/countersale_nettotpay_state.dart';
 import 'package:kuber/cubit/cubit/timer_cubit.dart';
 import 'package:kuber/cubit/dkdWinner/dkd_winner_cubit.dart';
 import 'package:kuber/cubit/dkdWinner/dkd_winner_state.dart';
 import 'package:kuber/cubit/drawtimecubit/draw_time_cubit.dart';
 import 'package:kuber/cubit/drawtimecubit/draw_time_state.dart';
 import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart';
+import 'package:kuber/print_receipt_code/counter_sale_print.dart';
+import 'package:kuber/print_receipt_code/net_to_pay_print.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
 import 'package:kuber/screens/onclickmenupopup/advance_draw_popup.dart';
 import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
@@ -116,6 +120,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   @override
   void initState() {
     super.initState();
+    context.read<BalanceUpdateCubit>().initializeBalanceSocket();
     getTodaysResultListByDate();
 
     _currentImageIndex = 0;
@@ -272,6 +277,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
 
   resetAllData() {
     setState(() {
+      context.read<BalanceUpdateCubit>().initializeBalanceSocket();
       finalResult = 0;
       upRowSelectedIndex = 0;
       advanceArray.clear();
@@ -298,37 +304,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   // bool btnSelected = true;
   Color btnSelectedColor = Color(0xFF5499c7);
   Color btnUnselectedColor = Color.fromARGB(255, 235, 239, 241);
-
-  String fromDate = '';
-  String toDate = '';
-
-  // Function to open the date picker and set the selected date
-  Future<void> _selectDate(BuildContext context, bool isFromDate) async {
-    DateTime initialDate = DateTime.now();
-    DateTime firstDate = DateTime(1900); // The first selectable date
-    DateTime lastDate = DateTime(2100); // The last selectable date
-
-    // Show the date picker dialog
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
-
-    if (pickedDate != null && pickedDate != initialDate) {
-      // Format the selected date
-      String formattedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
-
-      setState(() {
-        if (isFromDate) {
-          fromDate = formattedDate;
-        } else {
-          toDate = formattedDate;
-        }
-      });
-    }
-  }
 
   //////////////////////////////////// Timer //////////////////////////////
   late Timer _timer;
@@ -451,7 +426,16 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                           ),
                           GestureDetector(
                             onTap: () {
-                              _showAccountPopup(
+                              String currentDate = DateFormat('yyyy-MM-dd')
+                                  .format(DateTime.now());
+                              print(
+                                  currentDate); // Output will be something like "2025-01-25"
+                              context
+                                  .read<CountersaleNettotpayCubit>()
+                                  .initializeCounterSaleNettoPaySocket(
+                                      currentDate, currentDate);
+
+                              showAccountPopup(
                                   context, screenWidth, screenHeight);
                             },
                             child: Image.asset(
@@ -527,36 +511,36 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         ),
                         GestureDetector(
                           onTap: () {
-                            advanceDrawDialog(
-                                context,
-                                MediaQuery.of(context).size.width,
-                                MediaQuery.of(context).size.height,
-                                (selectedSlots) {
-                              setState(() {
-                                if (selectedSlots.isNotEmpty) {
-                                  isAdvArray = true;
-                                  advanceArray = selectedSlots;
-                                  print(
-                                      "printing advance array in advanceDrawDialog");
+                            // advanceDrawDialog(
+                            //     context,
+                            //     MediaQuery.of(context).size.width,
+                            //     MediaQuery.of(context).size.height,
+                            //     (selectedSlots) {
+                            //   setState(() {
+                            //     if (selectedSlots.isNotEmpty) {
+                            //       isAdvArray = true;
+                            //       advanceArray = selectedSlots;
+                            //       print(
+                            //           "printing advance array in advanceDrawDialog");
 
-                                  print(advanceArray);
-                                } else {
-                                  isAdvArray = false;
-                                }
-                              });
-                            }, (selectDrawSlots) {
-                              print("selected numbered draw slots");
-                              if (selectDrawSlots.isNotEmpty) {
-                                isAdvArray = true;
-                                advanceArray = selectDrawSlots;
-                                print(
-                                    "printing advance array in advanceDraw select Dialog");
+                            //       print(advanceArray);
+                            //     } else {
+                            //       isAdvArray = false;
+                            //     }
+                            //   });
+                            // }, (selectDrawSlots) {
+                            //   print("selected numbered draw slots");
+                            //   if (selectDrawSlots.isNotEmpty) {
+                            //     isAdvArray = true;
+                            //     advanceArray = selectDrawSlots;
+                            //     print(
+                            //         "printing advance array in advanceDraw select Dialog");
 
-                                print(advanceArray);
-                              } else {
-                                isAdvArray = false;
-                              }
-                            });
+                            //     print(advanceArray);
+                            //   } else {
+                            //     isAdvArray = false;
+                            //   }
+                            // });
                           },
                           child: Image.asset(
                             "assets/duskadam/advance.png",
@@ -1289,6 +1273,9 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                           setState(() {
                             _barcodeController.text = "";
                           });
+                          context
+                              .read<BalanceUpdateCubit>()
+                              .initializeBalanceSocket();
                         },
                         cursorHeight: 12,
                         style: const TextStyle(
@@ -1334,6 +1321,8 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                         if (state is TimerUpdated) {
                           isButtonEnabled = state.seconds >=
                               10; // Enable button if seconds >= 10
+                        } else {
+                          isButtonEnabled = false;
                         }
 
                         return CustomButton(
@@ -1343,7 +1332,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                           buttonText: "PRINT",
                           onPressed: isButtonEnabled
                               ? () {
-                                  if (finalResult > 10) {
+                                  if (finalResult > 0) {
                                     printBetData(isAdvArray, advanceArray);
                                   } else {
                                     print("Please, place a bet...");
@@ -1392,8 +1381,59 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   }
 
   /////////////// Show Account For Account ////////////////
-  void _showAccountPopup(
+  void showAccountPopup(
       BuildContext context, double screenWidth, double screenHeight) {
+    String fromDate = '';
+    String toDate = '';
+
+    String username = '';
+    String playPoint = '';
+    String winAmount = '';
+    String commission = '';
+    String nettopay = '';
+    DateTime now = DateTime.now();
+    String serverTime = DateFormat('yyyy-MM-dd hh:mm a').format(now);
+
+    // Function to open the date picker and set the selected date
+    Future<void> _selectDate(
+        BuildContext context, bool isFromDate, setDialogState) async {
+      DateTime initialDate = DateTime.now();
+      DateTime firstDate = DateTime(1900); // The first selectable date
+      DateTime lastDate = DateTime(2100); // The last selectable date
+
+      // Show the date picker dialog
+      final pickedDate = await showDatePicker(
+        context: context,
+        initialDate: initialDate,
+        firstDate: firstDate,
+        lastDate: lastDate,
+      );
+
+      if (pickedDate != null) {
+        // Format the selected date
+        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+
+        // Update the state and display the selected date
+        if (isFromDate) {
+          setState(() {
+            fromDate = formattedDate;
+          });
+
+          setDialogState(() {
+            fromDate = formattedDate;
+          });
+        } else {
+          setDialogState(() {
+            toDate = formattedDate;
+          });
+        }
+
+        // Print the fromDate and toDate after selection
+        print('From Date: $fromDate');
+        print('To Date: $toDate');
+      }
+    }
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1475,7 +1515,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                               fontSize: 12.sp, fontWeight: FontWeight.bold)),
                       SizedBox(width: 5),
                       GestureDetector(
-                        onTap: () => _selectDate(context, true),
+                        onTap: () => _selectDate(context, true, setDialogState),
                         child: Container(
                           padding: EdgeInsets.only(
                               top: 5, right: 65, bottom: 5, left: 5),
@@ -1494,7 +1534,8 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                               fontSize: 12.sp, fontWeight: FontWeight.bold)),
                       SizedBox(width: 5),
                       GestureDetector(
-                        onTap: () => _selectDate(context, false),
+                        onTap: () =>
+                            _selectDate(context, false, setDialogState),
                         child: Container(
                           padding: EdgeInsets.only(
                               top: 5, right: 65, bottom: 5, left: 5),
@@ -1508,7 +1549,12 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       ),
                       SizedBox(width: 5),
                       countersale_netto_pay(
-                        onClick: () {},
+                        onClick: () {
+                          context
+                              .read<CountersaleNettotpayCubit>()
+                              .initializeCounterSaleNettoPaySocket(
+                                  fromDate, toDate);
+                        },
                         title: "Submit",
                         fontsize: 12.sp,
                         bgColor: Colors.yellow,
@@ -1524,7 +1570,29 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       ),
                       SizedBox(width: 5),
                       countersale_netto_pay(
-                        onClick: () {},
+                        onClick: () {
+                          if (is_net_to_pay) {
+                            NetToPayPrint.netToPayPrintReceipt(
+                                username,
+                                fromDate,
+                                toDate,
+                                playPoint,
+                                winAmount,
+                                commission,
+                                nettopay,
+                                serverTime);
+                          } else {
+                            counterSalePrintReceipt(
+                                username,
+                                fromDate,
+                                toDate,
+                                playPoint,
+                                winAmount,
+                                commission,
+                                nettopay,
+                                serverTime);
+                          }
+                        },
                         title: "Print",
                         fontsize: 12.sp,
                         bgColor: Color(0xFF21618c),
@@ -1533,64 +1601,112 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.04),
-                  Row(
-                    children: [
-                      SizedBox(width: 5),
-                      AccountTable(),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.only(left: 10),
-                          height: screenHeight * 0.6,
-                          decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              borderRadius: BorderRadius.circular(1)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(height: 10),
-                              Text("Game Id : 10kaDum"),
-                              SizedBox(height: 10),
-                              Text("Counter Sale"),
-                              SizedBox(height: 10),
-                              Text("Retailer Code : retailer"),
-                              SizedBox(height: 10),
-                              Text("2025-01-21 To 2025-01-21"),
-                              SizedBox(height: 10),
-                              Divider(
-                                  height: 2, color: Colors.black, thickness: 5),
-                              SizedBox(height: 10),
-                              Text("Play 120",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 10),
-                              Text("Win - 0",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              is_net_to_pay
-                                  ? SizedBox(height: 10)
-                                  : Container(),
-                              is_net_to_pay
-                                  ? Text("Commission - 12",
+
+                  BlocBuilder<CountersaleNettotpayCubit,
+                      CountersaleNettotpayState>(builder: (context, state) {
+                    if (state is CountersaleNettotpayStateUpdated) {
+                      var data = state.data;
+                      var totalUserBets = state.data[0]['totalUserBets'];
+
+                      int listLength = totalUserBets.length;
+
+                      try {
+                        username = data[0]["username"];
+                        playPoint = data[0]["playPoint"];
+                        winAmount = data[0]["totalWinAmount"];
+                        commission = data[0]["commission"].toString();
+                        nettopay = data[0]["netToPay"].toString();
+                      } catch (e) {
+                        print(e);
+                      }
+
+                      if (totalUserBets.length == 1) {
+                        fromDate = totalUserBets[0]["date"];
+                        toDate = totalUserBets[0]["date"];
+                      } else {
+                        var totalUserBets =
+                            data[0]['totalUserBets'] as List<dynamic>;
+
+                        if (totalUserBets.isNotEmpty) {
+                          // Extract dates and convert them to String
+                          List<String> dates = totalUserBets
+                              .map((bet) => bet['date'].toString())
+                              .toList();
+
+                          // Sort dates
+                          dates.sort((a, b) => a.compareTo(b));
+
+                          fromDate = dates.first; // Earliest date
+                          toDate = dates.last; // Latest date
+                        }
+                      }
+
+                      return Row(
+                        children: [
+                          SizedBox(width: 5),
+                          AccountTable(),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Container(
+                              padding: EdgeInsets.only(left: 10),
+                              height: screenHeight * 0.6,
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  borderRadius: BorderRadius.circular(1)),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 10),
+                                  Text("Game Id : 10kaDum"),
+                                  SizedBox(height: 10),
+                                  Text("Counter Sale"),
+                                  SizedBox(height: 10),
+                                  Text("Retailer Code : retailer"),
+                                  SizedBox(height: 10),
+                                  Text("$fromDate To $toDate"),
+                                  SizedBox(height: 10),
+                                  Divider(
+                                      height: 2,
+                                      color: Colors.black,
+                                      thickness: 5),
+                                  SizedBox(height: 10),
+                                  Text("Play          ${data[0]["playPoint"]}",
                                       style: TextStyle(
-                                          fontWeight: FontWeight.bold))
-                                  : Container(),
-                              SizedBox(height: 10),
-                              Divider(
-                                  height: 2, color: Colors.black, thickness: 5),
-                              SizedBox(height: 10),
-                              Text("Outstanding 120",
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 10),
-                              Text("Server Time : 2025-01-21 03:38:05 PM"),
-                            ],
+                                          fontWeight: FontWeight.bold)),
+                                  SizedBox(height: 10),
+                                  Text(
+                                      "Win           ${data[0]["totalWinAmount"]}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  is_net_to_pay
+                                      ? SizedBox(height: 10)
+                                      : Container(),
+                                  is_net_to_pay
+                                      ? Text(
+                                          "Commission     ${data[0]["commission"]}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold))
+                                      : Container(),
+                                  SizedBox(height: 10),
+                                  Divider(
+                                      height: 2,
+                                      color: Colors.black,
+                                      thickness: 5),
+                                  SizedBox(height: 10),
+                                  Text("Outstanding   ${data[0]["netToPay"]}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  SizedBox(height: 10),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      SizedBox(width: 5),
-                    ],
-                  ),
+                          SizedBox(width: 5),
+                        ],
+                      );
+                    }
+                    return Container();
+                  })
                 ],
               ),
             ),
