@@ -18,12 +18,19 @@ import 'package:sizer/sizer.dart';
 import 'package:window_manager/window_manager.dart';
 // import 'package:window_manager/window_manager.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:process_run/process_run.dart';
 
 late IO.Socket socket;
 
 void main() async {
   HttpOverrides.global = MyHttpOverrides(); // Disable SSL verification
   WidgetsFlutterBinding.ensureInitialized();
+  // String exePath =
+  //     'D:\\Android Studio Projects\\kuber\\assets\\exefile\\resolu.exe';
+
+  // // Running the executable using Process.run
+  // ProcessResult result = await Process.run(exePath, [], runInShell: true);
+
   await windowManager.ensureInitialized();
 
   // Maximize the window by default

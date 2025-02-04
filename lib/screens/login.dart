@@ -1,5 +1,6 @@
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
@@ -87,12 +88,32 @@ class _LogInScreenState extends State<LogInScreen> {
                     const SizedBox(height: 10),
                     SizedBox(
                       width: 260,
-                      child: TextFormField(
-                        controller: _passwordController,
-                        decoration: _inputDecoration('Password'),
-                        obscureText: true,
-                        validator: (value) =>
-                            value!.isEmpty ? 'Enter password' : null,
+                      child: RawKeyboardListener(
+                        focusNode: FocusNode(),
+                        onKey: (event) {
+                          if (event is RawKeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.enter) {
+                            if (_formKey.currentState!.validate()) {
+                              // authCubit.login("retailer", "1234", systemUniqueId);
+                              if (_usernameController.text.isNotEmpty &&
+                                  _passwordController.text.isNotEmpty) {
+                                try {
+                                  authCubit.login(_usernameController.text,
+                                      _passwordController.text, systemUniqueId);
+                                } catch (e) {
+                                  print(e);
+                                }
+                              }
+                            }
+                          }
+                        },
+                        child: TextFormField(
+                          controller: _passwordController,
+                          decoration: _inputDecoration('Password'),
+                          obscureText: true,
+                          validator: (value) =>
+                              value!.isEmpty ? 'Enter password' : null,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),

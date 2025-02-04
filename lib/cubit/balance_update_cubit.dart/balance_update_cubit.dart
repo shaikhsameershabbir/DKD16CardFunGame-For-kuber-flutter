@@ -9,13 +9,11 @@ class BalanceUpdateCubit extends Cubit<BalanceUpdateState> {
   BalanceUpdateCubit({required this.socket}) : super(BalanceInitial());
 
   void initializeBalanceSocket() {
-    // print("get balance hitted");
     socket.emit("getBalance");
 
     socket.on("balanceResponse", (data) {
       // print("Balance updated: $data");
       emit(BalanceLoaded(data["balance"].toString()));
     });
-    // socket.connect();
   }
 }

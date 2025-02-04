@@ -4,6 +4,7 @@ import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/screens/dus_ka_dam_screen.dart';
 import 'package:kuber/widgets/animated_button.dart';
 import 'package:kuber/widgets/settings_card.dart';
+import 'package:window_manager/window_manager.dart';
 
 class GameOptions extends StatefulWidget {
   const GameOptions({super.key});
@@ -90,10 +91,10 @@ class _GameOptionsState extends State<GameOptions> {
                         title: 'Close',
                         subtitle: 'Exit the application',
                         color: const Color(0xFFFF7675),
-                        onTap: () {
+                        onTap: () async {
                           final cubit = context.read<AuthCubit>();
                           cubit.logout();
-                          Navigator.of(context).pop();
+                          windowManager.close();
                         },
                       ),
                     ],
