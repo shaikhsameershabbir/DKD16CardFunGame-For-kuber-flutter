@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:kuber/cubit/auth_cubit.dart';
+import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:kuber/widgets/show_dialog.dart';
 import 'package:sizer/sizer.dart';
@@ -150,6 +151,9 @@ class _CancelMenuTableState extends State<CancelMenuTable> {
                                 try {
                                   context.read<AuthCubit>().sendCancelTicket(
                                       ticket['ticketId'].toString());
+                                  context
+                                      .read<BalanceUpdateCubit>()
+                                      .initializeBalanceSocket();
                                   showSuccessDialog(
                                       context,
                                       "Ticket successfully cancelled and balance updated",

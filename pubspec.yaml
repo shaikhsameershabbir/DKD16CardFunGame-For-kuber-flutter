@@ -91,6 +91,16 @@ flutter:
     - assets/duskadam/colored/
     - assets/pdf/
 
+    - assets/cardgame/
+    - assets/cardgame/gamebg/
+    - assets/cardgame/logo/
+    - assets/cardgame/riveanimation/
+    - assets/cardgame/mainpageimages/
+    - assets/cardgame/mainpageimages/wincards/
+    - assets/cardgame/mainpageimages/cards/
+    - assets/cardgame/mainpageimages/chips/
+    - assets/cardgame/mainpageimages/greenbuttons/
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

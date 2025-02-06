@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kuber/cubit/password_change_cubit/password_change_cubit.dart';
+import 'package:kuber/cubit/password_change_cubit/password_change_state.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
 void showChangePasswordDialog(
     BuildContext context, double width, double height) {
+  final TextEditingController oldPasswordController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
   showDialog(
     context: context,
     builder: (BuildContext context) {
       return Dialog(
         child: Container(
           width: width * 0.70, // Set the desired width
-          height: height * 0.52, // Set the desired height
+          height: height * 0.58, // Set the desired height
           color: Color(0xFF87ceea),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -86,6 +91,7 @@ void showChangePasswordDialog(
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: TextField(
+                                controller: oldPasswordController,
                                 decoration: InputDecoration(
                                   labelText: "",
                                   border: InputBorder.none,
@@ -141,6 +147,7 @@ void showChangePasswordDialog(
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: TextField(
+                                controller: newPasswordController,
                                 decoration: InputDecoration(
                                   labelText: "",
                                   border: InputBorder.none,
@@ -152,6 +159,37 @@ void showChangePasswordDialog(
                           ),
                         ],
                       ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        BlocBuilder<PasswordChangeCubit, PasswordChangeState>(
+                            builder: (context, state) {
+                          if (state is PasswordChangedState) {
+                            oldPasswordController.clear();
+                            newPasswordController.clear();
+
+                            return Text(
+                              state.message,
+                              style:
+                                  TextStyle(color: Colors.green, fontSize: 20),
+                            );
+                          } else if (state is PasswordChangedStateError) {
+                            return Text(
+                              state.errorMessage,
+                              style: TextStyle(color: Colors.red, fontSize: 20),
+                            );
+                          } else if (state is PasswordChangeInitial) {
+                            Future.delayed(Duration(seconds: 2), (
+                                // Navigator.pop(context);
+                                ) {
+                              print("Executed after 2 seconds!");
+                              Navigator.pop(context);
+                            });
+                          }
+                          return Text("");
+                        })
+                      ],
                     ),
                     // Buttons
                     SizedBox(
@@ -166,7 +204,15 @@ void showChangePasswordDialog(
                             backgroundColor: Color(0xFFccc31c),
                             buttonText: "Submit",
                             onPressed: () {
-                              Navigator.pop(context);
+                              if (oldPasswordController.text.isNotEmpty &&
+                                  newPasswordController.text.isNotEmpty) {
+                                context
+                                    .read<PasswordChangeCubit>()
+                                    .initializePasswordChangeSocket(
+                                        oldPasswordController.text,
+                                        newPasswordController.text);
+                              }
+                              // Navigator.pop(context);
                             },
                             btnwidth: width * 0.07,
                             btnheight: height * 0.05,

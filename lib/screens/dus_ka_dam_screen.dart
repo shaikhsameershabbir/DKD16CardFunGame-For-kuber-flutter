@@ -18,6 +18,8 @@ import 'package:kuber/cubit/dkdWinner/dkd_winner_state.dart';
 import 'package:kuber/cubit/drawtimecubit/draw_time_cubit.dart';
 import 'package:kuber/cubit/drawtimecubit/draw_time_state.dart';
 import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart';
+import 'package:kuber/cubit/selectdatestate/from_and_to_date_state_cubit.dart';
+import 'package:kuber/cubit/selectdatestate/from_and_to_date_state_state.dart';
 import 'package:kuber/print_receipt_code/counter_sale_print.dart';
 import 'package:kuber/print_receipt_code/net_to_pay_print.dart';
 import 'package:kuber/screens/onclickmenupopup/account_screen.dart';
@@ -41,6 +43,8 @@ class DusKaDamScreen extends StatefulWidget {
 class _DusKaDamScreenState extends State<DusKaDamScreen>
     with SingleTickerProviderStateMixin {
   // List of asset images
+
+  int compareBalance = 0;
   final List<String> _images = [
     'assets/duskadam/colored/Asset 1.png',
     'assets/duskadam/colored/Asset 2.png',
@@ -90,6 +94,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   void initState() {
     super.initState();
     context.read<BalanceUpdateCubit>().initializeBalanceSocket();
+    context.read<DrawTimeCubit>().initializeDrawTimeSocket();
     getTodaysResultListByDate();
 
     _currentImageIndex = 0;
@@ -121,6 +126,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   void _startAnimation(String winner, String xValue) {
     _controller.reset();
     _isAnimating = true;
+
     _controller.forward().then((_) {
       // Ensure final image is set correctly when animation stops
       setState(() {
@@ -238,15 +244,12 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
 
     cubit.emitConfirmBet(betData);
     // context.read<BalanceUpdateCubit>().initializeBalanceSocket();
-
-    setState(() {
-      resetAllData();
-    });
+    resetAllData1();
   }
 
-  resetAllData() {
+  resetAllData1() {
+    context.read<BalanceUpdateCubit>().initializeBalanceSocket();
     setState(() {
-      context.read<BalanceUpdateCubit>().initializeBalanceSocket();
       finalResult = 0;
       upRowSelectedIndex = 0;
       advanceArray.clear();
@@ -266,6 +269,28 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
       placeTotalCoin11 = 0;
       placeTotalCoin12 = 0;
     });
+  }
+
+  resetAllData() {
+    // context.read<BalanceUpdateCubit>().initializeBalanceSocket();
+    finalResult = 0;
+    upRowSelectedIndex = 0;
+    advanceArray.clear();
+    advanceArray = [];
+    isAdvArray = false;
+
+    placeTotalCoin1 = 0;
+    placeTotalCoin2 = 0;
+    placeTotalCoin3 = 0;
+    placeTotalCoin4 = 0;
+    placeTotalCoin5 = 0;
+    placeTotalCoin6 = 0;
+    placeTotalCoin7 = 0;
+    placeTotalCoin8 = 0;
+    placeTotalCoin9 = 0;
+    placeTotalCoin10 = 0;
+    placeTotalCoin11 = 0;
+    placeTotalCoin12 = 0;
   }
 
   bool is_counter_sale = true;
@@ -678,6 +703,11 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                   child: BlocListener<DkdWinnerCubit, DkdWinnerState>(
                     listener: (context, state) {
                       if (state is DKDWinnerUpdated) {
+                        print(
+                            "+++++++++++++============ draw Time Hitted===========");
+                        context
+                            .read<DrawTimeCubit>()
+                            .initializeDrawTimeSocket();
                         _startAnimation(state.winner, state.xvalue);
                         print(
                             'DkdWinnerCubit received: ${state.winner}, ${state.xvalue}');
@@ -1749,6 +1779,10 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                       //     "Winning not declared ! \n Please wait..");
                                       // showSuccessDialog(context, "Bettter Luck Next Time!");
                                       context
+                                          .read<BalanceUpdateCubit>()
+                                          .initializeBalanceSocket();
+
+                                      context
                                           .read<ClaimTicketCubit>()
                                           .initializeClaimTicketSocket(
                                               context,
@@ -1759,9 +1793,6 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                       setState(() {
                                         _barcodeController.text = "";
                                       });
-                                      context
-                                          .read<BalanceUpdateCubit>()
-                                          .initializeBalanceSocket();
                                     },
                                     cursorHeight: 12,
                                     style: const TextStyle(
@@ -1832,20 +1863,19 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                       // showSuccessDialog(context,
                                       //     "Winning not declared ! \n Please wait..");
                                       // showSuccessDialog(context, "Bettter Luck Next Time!");
+
                                       context
                                           .read<ClaimTicketCubit>()
                                           .initializeClaimTicketSocket(
-                                              context,
-                                              _barcodeController.text,
-                                              screenWidth,
-                                              screenHeight);
+                                            context,
+                                            _barcodeController.text,
+                                            screenWidth,
+                                            screenHeight,
+                                          );
 
                                       setState(() {
                                         _barcodeController.text = "";
                                       });
-                                      context
-                                          .read<BalanceUpdateCubit>()
-                                          .initializeBalanceSocket();
                                     },
                                     cursorHeight: 12,
                                     style: const TextStyle(
@@ -1904,8 +1934,17 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                           BalanceUpdateState>(
                                       listener: (context, state) {
                                         if (state is BalanceLoaded) {
-                                          print(
-                                              "Balance updated: ${state.balance}");
+                                          // print(
+                                          //     "Balance updated: ${state.balance}");
+
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  "This is a SnackBar message!"),
+                                              duration: Duration(seconds: 2),
+                                            ),
+                                          );
                                         }
                                       },
                                       child: CustomButton(
@@ -1938,7 +1977,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                 btnheight: screenHeight * 0.05,
                                 buttonText: "RESET",
                                 onPressed: () {
-                                  resetAllData();
+                                  resetAllData1();
                                 },
                                 backgroundColor: Color(0xFFa93226),
                                 fontSize: 12,
@@ -1967,22 +2006,54 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                     isButtonEnabled = false;
                                   }
 
-                                  return CustomButton(
-                                    borderRadius: 16,
-                                    btnwidth: screenWidth * 0.07,
-                                    btnheight: screenHeight * 0.05,
-                                    buttonText: "PRINT",
-                                    onPressed: isButtonEnabled
-                                        ? () {
-                                            if (finalResult > 0) {
-                                              printBetData(
-                                                  isAdvArray, advanceArray);
-                                            } else {
-                                              print("Please, place a bet...");
-                                            }
-                                          }
-                                        : () {}, // Provide an empty function to satisfy VoidCallback
-                                    fontSize: 13,
+                                  return BlocBuilder<BalanceUpdateCubit,
+                                      BalanceUpdateState>(
+                                    builder: (context, balancestate) {
+                                      if (balancestate is BalanceLoaded) {
+                                        // print(
+                                        //     "Balance updated print button: ${balancestate.balance}");
+                                        compareBalance =
+                                            int.parse(balancestate.balance);
+
+                                        return CustomButton(
+                                          borderRadius: 16,
+                                          btnwidth: screenWidth * 0.09,
+                                          btnheight: screenHeight * 0.05,
+                                          buttonText: "PRINT",
+                                          onPressed: isButtonEnabled
+                                              ? () {
+                                                  if (finalResult >
+                                                      compareBalance) {
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            "Insufficient Balance.. $compareBalance"),
+                                                        duration: Duration(
+                                                            seconds: 2),
+                                                      ),
+                                                    );
+                                                    resetAllData1();
+                                                  } else if (finalResult > 0 &&
+                                                      finalResult <
+                                                          compareBalance) {
+                                                    printBetData(isAdvArray,
+                                                        advanceArray);
+                                                  } else {
+                                                    print(
+                                                        "Please, place a bet...");
+                                                  }
+                                                }
+                                              : () {}, // Provide an empty function to satisfy VoidCallback
+                                          fontSize: 12,
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    },
                                   );
                                 },
                               ),
@@ -1995,7 +2066,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                 btnheight: screenHeight * 0.05,
                                 buttonText: "RESET",
                                 onPressed: () {
-                                  resetAllData();
+                                  resetAllData1();
                                 },
                                 backgroundColor: Color(0xFFa93226),
                                 fontSize: 13,
@@ -2014,55 +2085,77 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
   /////////////// Show Account For Account ////////////////
   void showAccountPopup(
       BuildContext context, double screenWidth, double screenHeight) {
-    String fromDate = '';
-    String toDate = '';
-
     String username = '';
     String playPoint = '';
     String winAmount = '';
     String commission = '';
     String nettopay = '';
+
     DateTime now = DateTime.now();
     String serverTime = DateFormat('yyyy-MM-dd hh:mm a').format(now);
+    DateTime? _fromDate;
+    DateTime? _toDate;
+    String fromDate = 'yyyy-mm-dd';
+    String toDate = 'yyyy-mm-dd';
 
-    // Function to open the date picker and set the selected date
-    Future<void> _selectDate(
-        BuildContext context, bool isFromDate, setDialogState) async {
-      DateTime initialDate = DateTime.now();
-      DateTime firstDate = DateTime(1900); // The first selectable date
-      DateTime lastDate = DateTime(2100); // The last selectable date
+    Future<void> _selectDateRange() async {
+      DateTime now = DateTime.now();
+      DateTime firstDate =
+          DateTime(now.year - 5); // Allows selecting past dates
+      DateTime lastDate =
+          DateTime(now.year + 5); // Allows selecting future dates
 
-      // Show the date picker dialog
-      final pickedDate = await showDatePicker(
+      final DateTimeRange? picked = await showDateRangePicker(
         context: context,
-        initialDate: initialDate,
         firstDate: firstDate,
         lastDate: lastDate,
+        initialDateRange: _fromDate != null && _toDate != null
+            ? DateTimeRange(start: _fromDate!, end: _toDate!)
+            : null,
+        builder: (context, child) {
+          return Center(
+            child: Container(
+              width:
+                  MediaQuery.of(context).size.width * 0.3, // Adjust the width
+              height:
+                  MediaQuery.of(context).size.height * 0.5, // Adjust the height
+              child: Theme(
+                data: ThemeData.light().copyWith(
+                  dialogTheme: DialogTheme(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                ),
+                child: child!,
+              ),
+            ),
+          );
+        },
       );
 
-      if (pickedDate != null) {
-        // Format the selected date
-        String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+      if (picked != null) {
+        setState(() {
+          _fromDate = picked.start;
+          _toDate = picked.end;
 
-        // Update the state and display the selected date
-        if (isFromDate) {
-          setState(() {
-            fromDate = formattedDate;
-          });
+          fromDate = "${_fromDate!.toLocal()}".split(' ')[0];
+          toDate = "${_toDate!.toLocal()}".split(' ')[0];
 
-          setDialogState(() {
-            fromDate = formattedDate;
-          });
-        } else {
-          setDialogState(() {
-            toDate = formattedDate;
-          });
-        }
-
-        // Print the fromDate and toDate after selection
-        print('From Date: $fromDate');
-        print('To Date: $toDate');
+          context
+              .read<CountersaleNettotpayCubit>()
+              .initializeCounterSaleNettoPaySocket(fromDate, toDate);
+        });
       }
+    }
+
+    String _displayText() {
+      if (_fromDate == null || _toDate == null) {
+        return "yyyy-mm-dd";
+      }
+      return "${_fromDate!.toLocal()}".split(' ')[0] +
+          " to " +
+          "${_toDate!.toLocal()}".split(' ')[0];
     }
 
     showDialog(
@@ -2138,15 +2231,17 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                     ],
                   ),
                   SizedBox(height: screenHeight * 0.04),
+
                   Row(
+                    // mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(width: 15),
-                      Text("From",
+                      Text("   ",
                           style: TextStyle(
                               fontSize: 12.sp, fontWeight: FontWeight.bold)),
                       SizedBox(width: 5),
                       GestureDetector(
-                        onTap: () => _selectDate(context, true, setDialogState),
+                        onTap: _selectDateRange,
                         child: Container(
                           padding: EdgeInsets.only(
                               top: 5, right: 65, bottom: 5, left: 5),
@@ -2154,30 +2249,28 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                               border:
                                   Border.all(color: Colors.black, width: 0.2),
                               borderRadius: BorderRadius.circular(4)),
-                          child: Text(
-                              fromDate.isEmpty ? 'dd-mm-yyyy' : fromDate,
+                          child: Text("         Select Date",
+                              textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 16)),
                         ),
                       ),
-                      SizedBox(width: 5),
-                      Text("To",
-                          style: TextStyle(
-                              fontSize: 12.sp, fontWeight: FontWeight.bold)),
-                      SizedBox(width: 5),
-                      GestureDetector(
-                        onTap: () =>
-                            _selectDate(context, false, setDialogState),
-                        child: Container(
-                          padding: EdgeInsets.only(
-                              top: 5, right: 65, bottom: 5, left: 5),
-                          decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black, width: 0.2),
-                              borderRadius: BorderRadius.circular(4)),
-                          child: Text(toDate.isEmpty ? 'dd-mm-yyyy' : toDate,
-                              style: TextStyle(fontSize: 16)),
-                        ),
-                      ),
+                      // SizedBox(width: 5),
+                      // Text("To",
+                      //     style: TextStyle(
+                      //         fontSize: 12.sp, fontWeight: FontWeight.bold)),
+                      // SizedBox(width: 5),
+                      // GestureDetector(
+                      //   onTap: _selectDateRange,
+                      //   child: Container(
+                      //       padding: EdgeInsets.only(
+                      //           top: 5, right: 65, bottom: 5, left: 5),
+                      //       decoration: BoxDecoration(
+                      //           border:
+                      //               Border.all(color: Colors.black, width: 0.2),
+                      //           borderRadius: BorderRadius.circular(4)),
+                      //       child:
+                      //           Text(toDate, style: TextStyle(fontSize: 16))),
+                      // ),
                       SizedBox(width: 5),
                       countersale_netto_pay(
                         onClick: () {
@@ -2193,7 +2286,9 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                       ),
                       SizedBox(width: 5),
                       countersale_netto_pay(
-                        onClick: () {},
+                        onClick: () {
+                          Navigator.pop(context);
+                        },
                         title: "Cancel",
                         fontsize: 12.sp,
                         bgColor: Colors.red,
@@ -2292,7 +2387,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                   SizedBox(height: 10),
                                   Text("Counter Sale"),
                                   SizedBox(height: 10),
-                                  Text("Retailer Code : retailer"),
+                                  Text("Retailer Code : $username"),
                                   SizedBox(height: 10),
                                   Text("$fromDate To $toDate"),
                                   SizedBox(height: 10),
@@ -2301,12 +2396,13 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                       color: Colors.black,
                                       thickness: 5),
                                   SizedBox(height: 10),
-                                  Text("Play          ${data[0]["playPoint"]}",
+                                  Text(
+                                      "Play          ${data[0]["playPoint"].toString()}",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                   SizedBox(height: 10),
                                   Text(
-                                      "Win           ${data[0]["totalWinAmount"]}",
+                                      "Win           ${data[0]["totalWinAmount"].toString()}",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold)),
                                   is_net_to_pay
@@ -2314,7 +2410,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                       : Container(),
                                   is_net_to_pay
                                       ? Text(
-                                          "Commission     ${data[0]["commission"]}",
+                                          "Commission     ${data[0]["commission"].toString()}",
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold))
                                       : Container(),
@@ -2324,9 +2420,15 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
                                       color: Colors.black,
                                       thickness: 5),
                                   SizedBox(height: 10),
-                                  Text("Outstanding   ${data[0]["netToPay"]}",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold)),
+                                  is_net_to_pay
+                                      ? Text(
+                                          "Outstanding   ${(int.parse(data[0]["playPoint"].toString()) - int.parse(data[0]["totalWinAmount"].toString()) - int.parse(data[0]["commission"].toString())).toString()}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold))
+                                      : Text(
+                                          "Outstanding   ${(int.parse(data[0]["playPoint"].toString()) - int.parse(data[0]["totalWinAmount"].toString())).toString()}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold)),
                                   SizedBox(height: 10),
                                 ],
                               ),
@@ -2386,6 +2488,7 @@ class _DusKaDamScreenState extends State<DusKaDamScreen>
         BlocBuilder<TimerCubit, TimerState>(builder: (context, state) {
           if (state is TimerUpdated) {
             if (state.seconds < 10) {
+              resetAllData();
               filter = true;
               downRowSelectedIndex = 0;
               coinTotal = 0;

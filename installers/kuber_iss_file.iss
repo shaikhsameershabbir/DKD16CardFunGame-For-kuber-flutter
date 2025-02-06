@@ -3,14 +3,14 @@
 
 #define MyAppName "Kuber"
 #define MyAppVersion "1.0"
-#define MyAppPublisher "Coreline"
-#define MyAppURL "https://www.example.com/"
+#define MyAppPublisher "Kuber, Inc."
+#define MyAppURL "https://www.Kuber.com/"
 #define MyAppExeName "kuber.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
 ; (To generate a new GUID, click Tools | Generate GUID inside the IDE.)
-AppId={{68967E40-8F19-4B2E-8B10-B5DD03466EB5}
+AppId={{0E5EF5C7-CCD7-4253-8510-6E3178955C52}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
 import 'package:kuber/widgets/custom_button.dart';
 import 'package:sizer/sizer.dart';
 
@@ -11,11 +13,15 @@ void showPopup(
     int winAmount,
     int betTotal,
     String drawTime,
+    String drawDate,
     int winner,
-    String ticket) {
+    String ticket,
+    int xvalue,
+    BalanceUpdateCubit balanceCubit) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
+      balanceCubit.initializeBalanceSocket();
       return RawKeyboardListener(
         focusNode: FocusNode(), // Required for capturing key events
         autofocus: true, // Ensures the listener is active
@@ -57,7 +63,7 @@ void showPopup(
                               0.08, // Ensure the image height matches the parent container
                           decoration: BoxDecoration(
                             image: DecorationImage(
-                              image: AssetImage("assets/logo/logo.png"),
+                              image: AssetImage("assets/logo/kuber_logo.png"),
                               fit: BoxFit
                                   .contain, // Adjust the image fit as needed
                             ),
@@ -138,12 +144,25 @@ void showPopup(
                                       TextAlign.left, // Align text to the left
                                 ),
                               ),
-                              Text(
-                                "$winner",
-                                style: TextStyle(
-                                    fontSize: 11.sp, color: Color(0xFFd0d0d0)),
-                                textAlign:
-                                    TextAlign.left, // Align text to the left
+                              Row(
+                                children: [
+                                  Text(
+                                    "$winner ",
+                                    style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: Color(0xFFd0d0d0)),
+                                    textAlign: TextAlign
+                                        .left, // Align text to the left
+                                  ),
+                                  Text(
+                                    xvalue > 1 ? "  ${xvalue}X" : "",
+                                    style: TextStyle(
+                                        fontSize: 11.sp,
+                                        color: Color(0xFFd0d0d0)),
+                                    textAlign: TextAlign
+                                        .left, // Align text to the left
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -165,7 +184,7 @@ void showPopup(
                                 ),
                               ),
                               Text(
-                                '$drawTime',
+                                '$drawDate $drawTime',
                                 style: TextStyle(
                                     fontSize: 11.sp, color: Color(0xFFd0d0d0)),
                                 textAlign:
@@ -193,7 +212,7 @@ void showPopup(
                               Text(
                                 '$winAmount',
                                 style: TextStyle(
-                                    fontSize: 11.sp, color: Color(0xFFFFFFFF)),
+                                    fontSize: 17.sp, color: Color(0xFFFFFFFF)),
                                 textAlign:
                                     TextAlign.left, // Align text to the left
                               ),
@@ -208,6 +227,9 @@ void showPopup(
                                 backgroundColor: Color(0xFFee9130),
                                 buttonText: "OK",
                                 onPressed: () {
+                                  context
+                                      .read<BalanceUpdateCubit>()
+                                      .initializeBalanceSocket();
                                   Navigator.pop(context);
                                 },
                                 btnwidth: width * 0.05,

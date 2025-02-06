@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -68,31 +70,83 @@ class _LogInScreenState extends State<LogInScreen> {
             //     .initializeGetResultsSocket();
 
             return Center(
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset("assets/logo/kuber_logo.png",
-                        width: 160, height: 160),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: 260,
-                      child: TextFormField(
-                        controller: _usernameController,
-                        decoration: _inputDecoration('Username'),
-                        validator: (value) =>
-                            value!.isEmpty ? 'Enter username' : null,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          exit(0);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          width: 60,
+                          child: Image.asset("assets/duskadam/closewindow.png"),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    SizedBox(
-                      width: 260,
-                      child: RawKeyboardListener(
-                        focusNode: FocusNode(),
-                        onKey: (event) {
-                          if (event is RawKeyDownEvent &&
-                              event.logicalKey == LogicalKeyboardKey.enter) {
+                    ],
+                  ),
+                  SizedBox(
+                    height: 100,
+                  ),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset("assets/logo/kuber_logo.png",
+                            width: 160, height: 160),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: 260,
+                          child: TextFormField(
+                            controller: _usernameController,
+                            decoration: _inputDecoration('Username'),
+                            validator: (value) =>
+                                value!.isEmpty ? 'Enter username' : null,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          width: 260,
+                          child: RawKeyboardListener(
+                            focusNode: FocusNode(),
+                            onKey: (event) {
+                              if (event is RawKeyDownEvent &&
+                                  event.logicalKey ==
+                                      LogicalKeyboardKey.enter) {
+                                if (_formKey.currentState!.validate()) {
+                                  // authCubit.login("retailer", "1234", systemUniqueId);
+                                  if (_usernameController.text.isNotEmpty &&
+                                      _passwordController.text.isNotEmpty) {
+                                    try {
+                                      authCubit.login(
+                                          _usernameController.text,
+                                          _passwordController.text,
+                                          systemUniqueId);
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            child: TextFormField(
+                              controller: _passwordController,
+                              decoration: _inputDecoration('Password'),
+                              obscureText: true,
+                              validator: (value) =>
+                                  value!.isEmpty ? 'Enter password' : null,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFfed700),
+                          ),
+                          onPressed: () {
                             if (_formKey.currentState!.validate()) {
                               // authCubit.login("retailer", "1234", systemUniqueId);
                               if (_usernameController.text.isNotEmpty &&
@@ -105,58 +159,31 @@ class _LogInScreenState extends State<LogInScreen> {
                                 }
                               }
                             }
-                          }
-                        },
-                        child: TextFormField(
-                          controller: _passwordController,
-                          decoration: _inputDecoration('Password'),
-                          obscureText: true,
-                          validator: (value) =>
-                              value!.isEmpty ? 'Enter password' : null,
+                          },
+                          child: state is AuthLoading
+                              ? const CircularProgressIndicator()
+                              : const Text('Login'),
                         ),
-                      ),
+                        if (state is AuthSocketError)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              state.errorMessage,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        if (state is AuthLoginFailure)
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              state.errorMessage,
+                              style: const TextStyle(color: Colors.red),
+                            ),
+                          ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFfed700),
-                      ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          // authCubit.login("retailer", "1234", systemUniqueId);
-                          if (_usernameController.text.isNotEmpty &&
-                              _passwordController.text.isNotEmpty) {
-                            try {
-                              authCubit.login(_usernameController.text,
-                                  _passwordController.text, systemUniqueId);
-                            } catch (e) {
-                              print(e);
-                            }
-                          }
-                        }
-                      },
-                      child: state is AuthLoading
-                          ? const CircularProgressIndicator()
-                          : const Text('Login'),
-                    ),
-                    if (state is AuthSocketError)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          state.errorMessage,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      ),
-                    if (state is AuthLoginFailure)
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          state.errorMessage,
-                          style: const TextStyle(color: Colors.red),
-                        ),
-                      ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             );
           },

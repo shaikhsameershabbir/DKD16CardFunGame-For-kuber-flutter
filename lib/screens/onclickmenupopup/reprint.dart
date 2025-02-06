@@ -181,12 +181,11 @@ class _ReprintMenuTableState extends State<ReprintMenuTable> {
 
   Widget _buildDataCell(String text) {
     return Container(
-      padding: EdgeInsets.all(8),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-      ),
-    );
+        padding: EdgeInsets.all(8),
+        child: SelectableText(
+          text,
+          textAlign: TextAlign.center,
+        ));
   }
 }
 

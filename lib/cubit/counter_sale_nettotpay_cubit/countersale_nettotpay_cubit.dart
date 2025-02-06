@@ -9,13 +9,24 @@ class CountersaleNettotpayCubit extends Cubit<CountersaleNettotpayState> {
       : super(CountersaleNettotpayStateInitial());
 
   Future<void> initializeCounterSaleNettoPaySocket(fromdate, todate) async {
-    var data = {"fromDate": fromdate, "toDate": todate, "gameId": 1};
+    try {
+      var data = {
+        "fromDate": fromdate.toString(),
+        "toDate": todate.toString(),
+        "gameId": 1
+      };
+      print("-------------------hellov and todate -------------------------");
 
-    socket.emit("getUserAccountForGame", data);
+      print(data);
 
-    socket.on('getAddcountDataAllResponse', (response) {
-      // print("-------------------hellov and todate -------------------------");
-      emit(CountersaleNettotpayStateUpdated(response));
-    });
+      socket.emit("getUserAccountForGame", data);
+
+      socket.on('getAddcountDataAllResponse', (response) {
+        print(response);
+        emit(CountersaleNettotpayStateUpdated(response));
+      });
+    } catch (e) {
+      print("error in CountersaleNettotpayCubit");
+    }
   }
 }

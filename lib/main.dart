@@ -12,6 +12,8 @@ import 'package:kuber/cubit/cubit/timer_cubit.dart';
 import 'package:kuber/cubit/dkdWinner/dkd_winner_cubit.dart';
 import 'package:kuber/cubit/drawtimecubit/draw_time_cubit.dart';
 import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart';
+import 'package:kuber/cubit/password_change_cubit/password_change_cubit.dart';
+import 'package:kuber/cubit/selectdatestate/from_and_to_date_state_cubit.dart';
 import 'package:kuber/screens/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
@@ -42,8 +44,8 @@ void main() async {
   _token = prefs.getString('token');
 
   socket = IO.io(
-    "https://147.93.103.122:4000",
-    // "http://192.168.0.224:4000",
+    // "https://147.93.103.122:4000",
+    "http://192.168.0.225:4000",
     IO.OptionBuilder()
         .setTransports(['websocket'])
         .enableAutoConnect()
@@ -60,12 +62,10 @@ void main() async {
       enabled: false,
       builder: (context) => MultiBlocProvider(
         providers: [
+          BlocProvider(create: (context) => BalanceUpdateCubit(socket: socket)),
+          BlocProvider(create: (context) => DrawTimeCubit(socket: socket)),
           BlocProvider(
-              create: (context) => BalanceUpdateCubit(socket: socket)
-                ..initializeBalanceSocket()),
-          BlocProvider(
-              create: (context) =>
-                  DrawTimeCubit(socket: socket)..initializeDrawTimeSocket()),
+              create: (context) => FromAndToDateStateCubit(socket: socket)),
           BlocProvider(
               create: (context) =>
                   DkdWinnerCubit(socket: socket)..initializeDKDWinnerSocket()),
@@ -75,11 +75,20 @@ void main() async {
                 ..initializeGetResultsSocket(
                     DateFormat('yyyy-MM-dd').format(DateTime.now()))),
 // ------------------------------------------------------------------------------------------------------
-          BlocProvider(create: (context) => ClaimTicketCubit(socket: socket)),
+          BlocProvider(
+              create: (context) => ClaimTicketCubit(
+                  socket: socket,
+                  balanceCubit: context.read<BalanceUpdateCubit>())),
 // ------------------------------------------------------------------------------------------------------
           BlocProvider(
               create: (context) => CountersaleNettotpayCubit(socket: socket)),
 // ------------------------------------------------------------------------------------------------------
+          BlocProvider(
+              create: (context) => PasswordChangeCubit(socket: socket)),
+// ------------------------------------------------------------------------------------------------------
+
+// ------------------------------------------------------------------------------------------------------
+
           BlocProvider(
             create: (context) => AuthCubit(
                 socket: socket,

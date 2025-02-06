@@ -63,7 +63,7 @@ Future<void> counterSalePrintReceipt(username, fromDate, toDate, playPoint,
                 pw.SizedBox(height: 1),
                 pw.Divider(),
                 pw.SizedBox(height: 3),
-                pw.Text('Outstanding        $nettopay',
+                pw.Text('Outstanding        ${playPoint - winAmount}',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,

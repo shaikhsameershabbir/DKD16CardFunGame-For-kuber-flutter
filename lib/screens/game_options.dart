@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kuber/card16game/screen/card16_game_home.dart';
 import 'package:kuber/cubit/auth_cubit.dart';
+import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
 import 'package:kuber/screens/dus_ka_dam_screen.dart';
+import 'package:kuber/screens/login.dart';
 import 'package:kuber/widgets/animated_button.dart';
 import 'package:kuber/widgets/settings_card.dart';
 import 'package:window_manager/window_manager.dart';
@@ -34,17 +37,31 @@ class _GameOptionsState extends State<GameOptions> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                AnimatedButton(buttonText: "Card Game", onTap: () {}),
+                AnimatedButton(
+                    buttonText: "Card Game",
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Card16GameHome()));
+                    }),
                 SizedBox(
                   width: 20,
                 ),
                 AnimatedButton(
                     buttonText: "Dus Ka Dam",
                     onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DusKaDamScreen()));
+                      try {
+                        context
+                            .read<BalanceUpdateCubit>()
+                            .initializeBalanceSocket();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => DusKaDamScreen()));
+                      } catch (e) {
+                        print("error in 10 ka dum gameoption screen");
+                      }
                     }),
                 SizedBox(
                   width: 20,
@@ -92,9 +109,10 @@ class _GameOptionsState extends State<GameOptions> {
                         subtitle: 'Exit the application',
                         color: const Color(0xFFFF7675),
                         onTap: () async {
-                          final cubit = context.read<AuthCubit>();
-                          cubit.logout();
-                          windowManager.close();
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LogInScreen()));
                         },
                       ),
                     ],

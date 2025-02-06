@@ -25,7 +25,7 @@ void showSuccessDialog(
             borderRadius: BorderRadius.all(Radius.circular(0)),
           ),
           child: Container(
-            width: MediaQuery.of(context).size.width * 0.4, // Adjust width
+            width: MediaQuery.of(context).size.width * 0.6, // Adjust width
             // height: MediaQuery.of(context).size.height * 0.3,
             padding: EdgeInsets.all(0), // Remove padding
             child: Column(
@@ -94,11 +94,24 @@ void showSuccessDialog(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Text("drawTime"),
+
                       winAmount != 0
-                          ? Text(
-                              "Winning Amount:   ${winAmount.toString()}",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "   Winning Amount:  ",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  "${winAmount.toString()}",
+                                  style: TextStyle(
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             )
                           : Container(),
                     ],

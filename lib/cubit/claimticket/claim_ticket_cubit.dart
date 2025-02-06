@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
 import 'package:kuber/cubit/claimticket/claim_ticket_state.dart';
 import 'package:kuber/screens/onclickmenupopup/barcodeclick_winning_popup.dart';
 import 'package:kuber/widgets/show_dialog.dart';
@@ -6,8 +8,10 @@ import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class ClaimTicketCubit extends Cubit<ClaimTicketState> {
   final IO.Socket socket;
+  final BalanceUpdateCubit balanceCubit;
 
-  ClaimTicketCubit({required this.socket}) : super(ClaimTicketInitial());
+  ClaimTicketCubit({required this.socket, required this.balanceCubit})
+      : super(ClaimTicketInitial());
 
   void initializeClaimTicketSocket(
       context, ticket, screenWidth, screenHeight) async {
@@ -15,17 +19,27 @@ class ClaimTicketCubit extends Cubit<ClaimTicketState> {
     int winAmount;
     int betTotal;
     String drawTime;
+    String drawDate;
     int winner;
     bool already;
     bool success;
+    int xvalue;
     try {
-      print("i am inside ClaimTicketCubit.............................");
-
       // socket.emit("claimTicket", ticket);
       if (RegExp(r'^\d{6}$').hasMatch(ticket)) {
         socket.emit("claimTicket", ticket);
       } else {
         print("Invalid ticket: Ticket must be a 6-digit number");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text(
+              "Invalid ticket: Ticket must be a 6-digit number",
+              textAlign: TextAlign.center,
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
       }
       // socket.emit("claimTicket", "680340");
       socket.off("claimTicketResponse");
@@ -43,16 +57,32 @@ class ClaimTicketCubit extends Cubit<ClaimTicketState> {
 
           betTotal = response["data"]["betTotal"];
 
-          drawTime = response["data"]["drawDate"];
+          drawTime = response["data"]["drawTime"];
+          drawDate = response["data"]["drawDate"];
 
           winner = response["data"]?["winner"];
+          xvalue = response["data"]?["xValue"];
 
-          showPopup(context, ticket, screenWidth, screenHeight, winAmount,
-              betTotal, drawTime, winner, ticket);
+          // balanceCubit.initializeBalanceSocket();
+
+          showPopup(
+              context,
+              ticket,
+              screenWidth,
+              screenHeight,
+              winAmount,
+              betTotal,
+              drawTime,
+              drawDate,
+              winner,
+              ticket,
+              xvalue,
+              balanceCubit);
         }
         if (success == false && already == true) {
           message = response["data"]["message"];
-          showSuccessDialog(context, message, "", 0);
+          int claimAmount = response["data"]["winAmount"];
+          showSuccessDialog(context, message, "", claimAmount);
         }
 
         if (success == false && already == false) {

@@ -67,6 +67,7 @@ class AuthCubit extends Cubit<AuthState> {
       };
 
       socket.emit('userLogin', loginData);
+      balanceCubit.initializeBalanceSocket();
 
       // socket.on("error", (error) {
       //   emit(AuthLoginFailure("Error during login: ${error.toString()}"));
@@ -105,18 +106,6 @@ class AuthCubit extends Cubit<AuthState> {
     socket.io.options?['auth'] = {'token': _token};
   }
 
-  // //getBalance //getResponse
-  // void listenForBalanceUpdates() {
-  //   socket.emit("getBalance");
-
-  //   socket.on("balanceResponse", (data) {
-  //     // print("Balance updated: $data");
-  //     emit(AuthBalanceUpdated(data["balance"].toString()));
-  //     socket.off("balanceResponse");
-  //   });
-  //   socket.off("balanceResponse");
-  // }
-
   void getCurrentDrawTickets() {
     socket.emit("getAllTickets");
 
@@ -141,13 +130,13 @@ class AuthCubit extends Cubit<AuthState> {
 
   // reprint show 10 records
   void getLast10Bets(context, width, height) {
-    print("print last 10 bets");
+    // print("print last 10 bets");
     socket.emit("last10Bets", 1); // game id
 
     socket.off("last10BetsResponce");
     socket.on("last10BetsResponce", (last10Bets) {
-      print("last 10 bets response");
-      print(last10Bets);
+      // print("last 10 bets response");
+      // print(last10Bets);
       List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(last10Bets);
       reprintDialog(context, width, height, data);

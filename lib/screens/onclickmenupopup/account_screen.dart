@@ -191,10 +191,10 @@ class AccountTable extends StatelessWidget {
             child: SingleChildScrollView(
               child: Table(
                 columnWidths: {
-                  0: FixedColumnWidth(50), // Sr.No width
-                  1: FixedColumnWidth(100), // Date width
-                  2: FixedColumnWidth(60), // Play width
-                  3: FixedColumnWidth(60), // Win width
+                  0: FixedColumnWidth(50),
+                  1: FixedColumnWidth(100),
+                  2: FixedColumnWidth(60),
+                  3: FixedColumnWidth(60),
                   4: FixedColumnWidth(60), // Point width
                 },
                 border: TableBorder.all(
@@ -268,15 +268,3 @@ class AccountTable extends StatelessWidget {
 
   // Helper method for data cells
 }
-
-
-//  TableRow(
-//                 decoration: BoxDecoration(color: Colors.amber),
-//                 children: [
-//                   dataCell(''),
-//                   dataCell('Total', bold: true),
-//                   dataCell('120', bold: true),
-//                   dataCell('0', bold: true),
-//                   dataCell('120', bold: true),
-//                 ],
-//               ),
