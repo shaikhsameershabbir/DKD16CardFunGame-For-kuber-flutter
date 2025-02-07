@@ -9,11 +9,9 @@ class DrawTimeCubit extends Cubit<DrawTimeState> {
   DrawTimeCubit({required this.socket}) : super(DrawTimeInitial());
 
   void initializeDrawTimeSocket() {
-    print("get draw Time hitted");
     socket.emit("getDrawTime", 1);
 
     socket.on("getDrawTimeResponse", (drawtime) {
-      // print("draw Time updated: $drawtime");
       emit(DrawTimeLoaded(
           drawtime["drawTime"].toString(), drawtime["drawDate"].toString()));
     });

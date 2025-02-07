@@ -15,14 +15,10 @@ class CountersaleNettotpayCubit extends Cubit<CountersaleNettotpayState> {
         "toDate": todate.toString(),
         "gameId": 1
       };
-      print("-------------------hellov and todate -------------------------");
-
-      print(data);
 
       socket.emit("getUserAccountForGame", data);
 
       socket.on('getAddcountDataAllResponse', (response) {
-        print(response);
         emit(CountersaleNettotpayStateUpdated(response));
       });
     } catch (e) {

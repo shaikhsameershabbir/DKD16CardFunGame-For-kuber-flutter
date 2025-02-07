@@ -8,23 +8,17 @@ class PasswordChangeCubit extends Cubit<PasswordChangeState> {
   PasswordChangeCubit({required this.socket}) : super(PasswordChangeInitial());
 
   void initializePasswordChangeSocket(currentPass, newPass) {
-    print("password change hitted");
     var data = {
       "currentPassword": currentPass.toString().trim(),
       "newPassword": newPass.toString().trim()
     };
-    print("printing current and ld password===============");
-    print(currentPass);
-    print(newPass);
+
     emit(PasswordChangeInitial());
     socket.emit("changePassword", data);
 
     socket.on("changePasswordResponse", (changePassResponse) {
       if (changePassResponse['success'] == true) {
         emit(PasswordChangedState(changePassResponse["message"]));
-        Future.delayed(Duration(seconds: 2), () {
-          emit(PasswordChangeInitial());
-        });
       } else {
         emit(PasswordChangedStateError(changePassResponse["message"]));
       }

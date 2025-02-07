@@ -179,13 +179,6 @@ void showChangePasswordDialog(
                               state.errorMessage,
                               style: TextStyle(color: Colors.red, fontSize: 20),
                             );
-                          } else if (state is PasswordChangeInitial) {
-                            Future.delayed(Duration(seconds: 2), (
-                                // Navigator.pop(context);
-                                ) {
-                              print("Executed after 2 seconds!");
-                              Navigator.pop(context);
-                            });
                           }
                           return Text("");
                         })

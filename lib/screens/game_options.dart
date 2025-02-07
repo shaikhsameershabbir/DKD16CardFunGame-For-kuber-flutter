@@ -1,13 +1,33 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kuber/card16game/screen/card16_game_home.dart';
 import 'package:kuber/cubit/auth_cubit.dart';
 import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
+import 'package:kuber/main.dart';
 import 'package:kuber/screens/dus_ka_dam_screen.dart';
 import 'package:kuber/screens/login.dart';
+import 'package:kuber/socket_serive/socket_service.dart';
 import 'package:kuber/widgets/animated_button.dart';
 import 'package:kuber/widgets/settings_card.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+import 'package:intl/intl.dart';
+
+import 'package:kuber/cubit/claimticket/claim_ticket_cubit.dart';
+import 'package:kuber/cubit/cleardata/clear_data_cubit.dart';
+import 'package:kuber/cubit/counter_sale_nettotpay_cubit/countersale_nettotpay_cubit.dart';
+import 'package:kuber/cubit/cubit/timer_cubit.dart';
+import 'package:kuber/cubit/dkdWinner/dkd_winner_cubit.dart';
+import 'package:kuber/cubit/drawtimecubit/draw_time_cubit.dart';
+import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart';
+import 'package:kuber/cubit/password_change_cubit/password_change_cubit.dart';
+import 'package:kuber/cubit/selectdatestate/from_and_to_date_state_cubit.dart';
+
+////////////   below old working code ////////////////
 
 class GameOptions extends StatefulWidget {
   const GameOptions({super.key});
@@ -21,6 +41,9 @@ class _GameOptionsState extends State<GameOptions> {
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     // double height = MediaQuery.of(context).size.height;
+
+    // print("balance geting");
+    // context.read<BalanceUpdateCubit>().initializeBalanceSocket();
     return Stack(
       children: [
         Container(
@@ -50,11 +73,8 @@ class _GameOptionsState extends State<GameOptions> {
                 ),
                 AnimatedButton(
                     buttonText: "Dus Ka Dam",
-                    onTap: () {
+                    onTap: () async {
                       try {
-                        context
-                            .read<BalanceUpdateCubit>()
-                            .initializeBalanceSocket();
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -90,9 +110,7 @@ class _GameOptionsState extends State<GameOptions> {
                         title: 'Account',
                         subtitle: 'Personal information, email',
                         color: const Color(0xFF6C5CE7),
-                        onTap: () {
-                          // Handle account tap
-                        },
+                        onTap: () async {},
                       ),
                       SettingsCard(
                         icon: Icons.lock_outline,
@@ -109,10 +127,11 @@ class _GameOptionsState extends State<GameOptions> {
                         subtitle: 'Exit the application',
                         color: const Color(0xFFFF7675),
                         onTap: () async {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LogInScreen()));
+                          try {
+                            exit(0);
+                          } catch (e) {
+                            print("error while logout in gameoptions");
+                          }
                         },
                       ),
                     ],

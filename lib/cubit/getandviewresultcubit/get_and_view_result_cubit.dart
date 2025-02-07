@@ -13,7 +13,6 @@ class GetAndViewResultCubit extends Cubit<GetAndViewResultState> {
     socket.emit("gateDateResult", sendData);
 
     socket.on('gateDateResultResponse', (results) {
-      // print("$results");
       List<Map<String, dynamic>> checkLength =
           List<Map<String, dynamic>>.from(results);
 

@@ -15,6 +15,7 @@ import 'package:kuber/cubit/getandviewresultcubit/get_and_view_result_cubit.dart
 import 'package:kuber/cubit/password_change_cubit/password_change_cubit.dart';
 import 'package:kuber/cubit/selectdatestate/from_and_to_date_state_cubit.dart';
 import 'package:kuber/screens/login.dart';
+import 'package:kuber/socket_serive/socket_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:window_manager/window_manager.dart';
@@ -39,21 +40,11 @@ void main() async {
   windowManager.setFullScreen(true);
 
   String? _token;
-
   final prefs = await SharedPreferences.getInstance();
+
   _token = prefs.getString('token');
 
-  socket = IO.io(
-    // "https://147.93.103.122:4000",
-    "http://192.168.0.225:4000",
-    IO.OptionBuilder()
-        .setTransports(['websocket'])
-        .enableAutoConnect()
-        .setExtraHeaders({'Cookie': 'token=$_token'}) // Send token as cookie
-        .setAuth({'token': _token}) // Also send in auth for redundancy
-        .build(),
-  );
-
+  socket = createSocket(_token!);
   // Connect the socket first before passing it to the cubits
   socket.onConnect((_) {
     print("Socket Connected to server.");
@@ -96,8 +87,9 @@ void main() async {
               ..initializeSocket(),
           ),
           BlocProvider(
-            create: (context) =>
-                TimerCubit(socket: socket)..initializeTimerSocket(),
+            create: (context) => TimerCubit(
+                socket: socket, drawTime: context.read<DrawTimeCubit>())
+              ..initializeTimerSocket(),
           ),
         ],
         child: MyApp(),

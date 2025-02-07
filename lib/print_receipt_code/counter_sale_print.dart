@@ -29,6 +29,12 @@ Future<void> counterSalePrintReceipt(username, fromDate, toDate, playPoint,
                                 fontWeight: pw.FontWeight.bold,
                                 fontSize: 15)))),
                 pw.SizedBox(height: 5),
+                pw.Text('10KaDam',
+                    style: pw.TextStyle(
+                      fontSize: 9,
+                      fontWeight: pw.FontWeight.bold,
+                    )),
+                pw.SizedBox(height: 2),
                 pw.Text('Counter Sale',
                     style: pw.TextStyle(
                       fontSize: 9,
@@ -63,7 +69,8 @@ Future<void> counterSalePrintReceipt(username, fromDate, toDate, playPoint,
                 pw.SizedBox(height: 1),
                 pw.Divider(),
                 pw.SizedBox(height: 3),
-                pw.Text('Outstanding        ${playPoint - winAmount}',
+                pw.Text(
+                    'Outstanding        ${((int.parse(playPoint)) - (int.parse(winAmount)))}',
                     style: pw.TextStyle(
                       fontSize: 8,
                       fontWeight: pw.FontWeight.bold,

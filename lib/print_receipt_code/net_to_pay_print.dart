@@ -30,6 +30,12 @@ class NetToPayPrint {
                                   fontWeight: pw.FontWeight.bold,
                                   fontSize: 15)))),
                   pw.SizedBox(height: 5),
+                  pw.Text('10KaDam',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                      )),
+                  pw.SizedBox(height: 5),
                   pw.Text('Net To Pay',
                       style: pw.TextStyle(
                         fontSize: 9,

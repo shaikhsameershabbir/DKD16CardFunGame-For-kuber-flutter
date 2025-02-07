@@ -25,11 +25,9 @@ class ClaimTicketCubit extends Cubit<ClaimTicketState> {
     bool success;
     int xvalue;
     try {
-      // socket.emit("claimTicket", ticket);
       if (RegExp(r'^\d{6}$').hasMatch(ticket)) {
         socket.emit("claimTicket", ticket);
       } else {
-        print("Invalid ticket: Ticket must be a 6-digit number");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.red,
@@ -44,8 +42,6 @@ class ClaimTicketCubit extends Cubit<ClaimTicketState> {
       // socket.emit("claimTicket", "680340");
       socket.off("claimTicketResponse");
       socket.on("claimTicketResponse", (response) {
-        print("printing rsponse from claim ticket cubit");
-        print(response);
         success = response["success"];
         already = response["already"];
 
@@ -63,7 +59,7 @@ class ClaimTicketCubit extends Cubit<ClaimTicketState> {
           winner = response["data"]?["winner"];
           xvalue = response["data"]?["xValue"];
 
-          // balanceCubit.initializeBalanceSocket();
+          balanceCubit.initializeBalanceSocket();
 
           showPopup(
               context,

@@ -31,7 +31,7 @@ class _ResultDialogState extends State<ResultDialog> {
 
   void getTodaysResultListByDate() {
     newSelectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    print("data from patti button $newSelectedDate");
+
     context
         .read<GetAndViewResultCubit>()
         .initializeGetResultsSocket(newSelectedDate);

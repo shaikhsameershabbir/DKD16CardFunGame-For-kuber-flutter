@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kuber/cubit/balance_update_cubit.dart/balance_update_cubit.dart';
+import 'package:kuber/main.dart';
 import 'package:kuber/print_receipt_code/acccount_main_page_bet_print.dart';
 import 'package:kuber/print_receipt_code/reprint_single_ticket.dart';
 import 'package:kuber/screens/onclickmenupopup/reprint.dart';
@@ -19,36 +22,32 @@ class AuthCubit extends Cubit<AuthState> {
   // Initialize socket and include cookie in headers
   Future<void> initializeSocket() async {
     try {
-      print("i am inside AuthCubit");
-
       socket.onConnect((_) {
-        print("Connected");
         emit(AuthSocketConnected());
       });
 
       socket.onDisconnect((_) {
-        print("Disconnected");
         emit(AuthSocketDisconnected());
       });
 
-      socket.on('loginResponse', (data) {
-        print("loginResponse - $data");
+      // socket.on('loginResponse', (data) {
+      //   print("loginResponse - $data");
 
-        if (data['success']) {
-          emit(AuthLoginSuccess(data));
-        } else {
-          emit(AuthLoginFailure(data['message']));
-        }
-      });
+      //   if (data['success']) {
+      //     emit(AuthLoginSuccess(data));
+      //   } else {
+      //     emit(AuthLoginFailure(data['message']));
+      //   }
+      // });
 
-      socket.on("setCookie", (cookie) async {
-        print("Received cookie: $cookie");
+      // socket.on("setCookie", (cookie) async {
+      //   print("Received cookie: $cookie");
 
-        if (cookie['name'] == 'token' && cookie['value'] != null) {
-          String newToken = cookie['value'];
-          await _updateToken(newToken);
-        }
-      });
+      //   if (cookie['name'] == 'token' && cookie['value'] != null) {
+      //     String newToken = cookie['value'];
+      //     await _updateToken(newToken);
+      //   }
+      // });
 
       socket.connect();
     } catch (e) {
@@ -67,11 +66,44 @@ class AuthCubit extends Cubit<AuthState> {
       };
 
       socket.emit('userLogin', loginData);
-      balanceCubit.initializeBalanceSocket();
 
-      // socket.on("error", (error) {
-      //   emit(AuthLoginFailure("Error during login: ${error.toString()}"));
+      socket.on('loginResponse', (data) async {
+        print("Login response - $data");
+
+        if (data['success']) {
+          if (data['name'] == 'token' && data['value'] != null) {
+            String newToken = data['value'];
+            int userId = data["userId"];
+            socket.auth = {
+              'token': newToken
+            }; // Update the authentication token
+            var prewSocket = socket.id;
+            socket.disconnect(); // Disconnect the socket
+
+            socket.once('connect', (_) {
+              var newSocket = socket.id;
+              socket.emit(
+                  'socketChanged', {'userId': userId, 'newSocket': newSocket});
+            });
+            await socket.connect(); // Reconnect with the updated token
+
+            await _updateToken(newToken);
+          }
+          // await _updateToken(newToken);
+          emit(AuthLoginSuccess(data));
+        } else {
+          emit(AuthLoginFailure(data['message']));
+        }
+      });
+
+      // socket.on("setCookie", (cookie) async {
+      //   final prefs = await SharedPreferences.getInstance();
+
       // });
+
+      socket.on("error", (error) {
+        emit(AuthLoginFailure("Error during login: ${error.toString()}"));
+      });
     } catch (e) {
       emit(AuthLoginFailure("Login failed: ${e.toString()}"));
     }
@@ -84,27 +116,54 @@ class AuthCubit extends Cubit<AuthState> {
     socket.off("betConfirmed");
 
     socket.on("betConfirmed", (confirmBetResponse) async {
-      print("place bet response - $confirmBetResponse");
       if (confirmBetResponse != null) {
         balanceCubit.initializeBalanceSocket();
         await AcccountMainPageBetPrint.mainPageBetPrintReceipt(
             confirmBetResponse);
-      } else {
-        print("betConfirmResponse null");
-      }
+      } else {}
     });
   }
 
+  // Future<void> _updateToken(String newToken) async {
+  //   _token = newToken;
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('token', newToken);
+
+  //   // Update socket connection with new token
+  //   socket.io.options?['extraHeaders'] = {'Authorization': 'Bearer $_token'};
+  //   socket.io.options?['auth'] = {'token': _token};
+
+  //   // Reconnect socket to apply new token
+  //   // socket.disconnect();
+  //   socket.connect();
+  // }
+
+  // Future<void> _clearToken() async {
+  //   _token = null;
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.remove('token');
+
+  //   // Clear token from socket connection
+  //   socket.io.options?['extraHeaders'] = {};
+  //   socket.io.options?['auth'] = {};
+  // }
+
+///////////////// my code ///////////////
   // Update token in both memory and persistent storage
   Future<void> _updateToken(String newToken) async {
     _token = newToken;
     final prefs = await SharedPreferences.getInstance();
+    try {
+      await prefs.clear();
+    } catch (e) {}
     await prefs.setString('token', newToken);
 
-    // Optionally, if you're using the token in headers for socket events:
     socket.io.options?['extraHeaders'] = {'Cookie': 'token=$_token'};
     socket.io.options?['auth'] = {'token': _token};
   }
+  // // // Optionally, if you're using the token in headers for socket events:
+  // // socket.io.options?['extraHeaders'] = {'Cookie': 'token=$_token'};
+  // // socket.io.options?['auth'] = {'token': _token};
 
   void getCurrentDrawTickets() {
     socket.emit("getAllTickets");
@@ -119,9 +178,8 @@ class AuthCubit extends Cubit<AuthState> {
 
   void sendCancelTicket(String ticketId) {
     socket.emit("cancelTicket", ticketId);
+    socket.off("cancelTicketResponse");
     socket.on("cancelTicketResponse", (cancelTicketResponse) {
-      print("printing cancel Ticket Response");
-      print(cancelTicketResponse);
       if (cancelTicketResponse["success"] == true) {
         balanceCubit.initializeBalanceSocket();
       }
@@ -130,13 +188,10 @@ class AuthCubit extends Cubit<AuthState> {
 
   // reprint show 10 records
   void getLast10Bets(context, width, height) {
-    // print("print last 10 bets");
     socket.emit("last10Bets", 1); // game id
 
     socket.off("last10BetsResponce");
     socket.on("last10BetsResponce", (last10Bets) {
-      // print("last 10 bets response");
-      // print(last10Bets);
       List<Map<String, dynamic>> data =
           List<Map<String, dynamic>>.from(last10Bets);
       reprintDialog(context, width, height, data);
@@ -145,22 +200,20 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void getSingleTicketDataFromLast10Bets(String ticket) {
-    // print("single ticket: $ticket");
     socket.emit("getTicketData", ticket);
     socket.off("getTicketDataResponse");
     socket.on("getTicketDataResponse", (singleTicketData) async {
-      // print(
-      // print(singleTicketData);
       if (singleTicketData != null) {
         await ReprintSingleTicket.printSingleTicketReceipt(singleTicketData);
       } else {}
     });
   }
 
-  // Logout method
-  void logout() {
+  void logout() async {
     try {
-      socket.disconnect();
+      socket.emit("userLogout");
+      final prefs = await SharedPreferences.getInstance();
+      prefs.clear();
       emit(AuthLoggedOut());
     } catch (e) {
       emit(AuthSocketError("Logout failed: ${e.toString()}"));

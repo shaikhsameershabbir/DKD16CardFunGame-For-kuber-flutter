@@ -12,7 +12,6 @@ class DkdWinnerCubit extends Cubit<DkdWinnerState> {
     // {winner: 1, xValue: 1}
     socket.off("dkdWinner");
     socket.on('dkdWinner', (dkdResponse) {
-      print("one time from cubit $dkdResponse");
       String winner = dkdResponse['winner'].toString();
       String xValue = dkdResponse['xValue'].toString();
       emit(DKDWinnerUpdated(winner, xValue));

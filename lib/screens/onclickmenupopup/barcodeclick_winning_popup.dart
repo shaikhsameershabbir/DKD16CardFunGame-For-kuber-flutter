@@ -23,7 +23,7 @@ void showPopup(
     builder: (BuildContext context) {
       balanceCubit.initializeBalanceSocket();
       return RawKeyboardListener(
-        focusNode: FocusNode(), // Required for capturing key events
+        focusNode: FocusNode(),
         autofocus: true, // Ensures the listener is active
         onKey: (RawKeyEvent event) {
           if (event is RawKeyDownEvent) {

@@ -717,7 +717,7 @@ class _HomePageState extends State<Card16GameHome> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          exit(0);
+                          Navigator.pop(context);
                         },
                         child: Padding(
                           padding: EdgeInsets.all(screenWidth * 0.01),
